@@ -1,7 +1,10 @@
 package io.github.jacquelynoelle.padfoot;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -63,5 +66,23 @@ public class MainActivity extends AppCompatActivity {
                 editText.getText().clear();
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        menu.findItem(R.id.menu_ble).setVisible(true);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_ble:
+                final Intent intent = new Intent(this, DeviceScanActivity.class);
+                startActivity(intent);
+                break;
+        }
+        return true;
     }
 }
