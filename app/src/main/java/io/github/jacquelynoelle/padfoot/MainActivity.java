@@ -39,9 +39,9 @@ public class MainActivity extends AppCompatActivity {
         eventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Pet newPet = dataSnapshot.getValue(Pet.class);
-                String newText = "Added pet: " + newPet.name;
-                displayText.setText(newText);
+//                Pet newPet = dataSnapshot.getValue(Pet.class); // not working when most recent data is not a Pet object
+//                String newText = "Added pet: " + newPet.name;
+//                displayText.setText(newText);
             }
 
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
