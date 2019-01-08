@@ -5,4 +5,8 @@
         android:checkable="false"
         android:orderInCategory="1"
         android:showAsAction="ifRoom|withText"/>
+    <item
+        android:id="@+id/sign_out_menu"
+        android:title="@string/sign_out"
+        android:showAsAction="never"/>
 </menu>

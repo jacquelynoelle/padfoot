@@ -54,6 +54,7 @@ public class DeviceScanActivity extends ListActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
 //        getSupportActionBar().setTitle(R.string.title_devices);
         mHandler = new Handler();
@@ -81,9 +82,6 @@ public class DeviceScanActivity extends ListActivity {
         mLeDeviceListAdapter = new LeDeviceListAdapter();
         setListAdapter(mLeDeviceListAdapter);
         scanLeDevice(true);
-
-        Log.e("WELL", "WELL I GUESS IT GOT TO HERE");
-
     }
 
     @Override
@@ -232,7 +230,6 @@ public class DeviceScanActivity extends ListActivity {
             ViewHolder viewHolder;
             // General ListView optimization code.
             if (view == null) {
-                Log.e("WOAH", "WELL IT GOT TO HERE");
                 view = mInflator.inflate(R.layout.listitem_device, null);
                 viewHolder = new ViewHolder();
                 viewHolder.deviceAddress = (TextView) view.findViewById(R.id.device_address);
@@ -240,7 +237,6 @@ public class DeviceScanActivity extends ListActivity {
                 view.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) view.getTag();
-                Log.e("WOAH NOW", "WELL IT GOT TO HERE NOW");
             }
 
             BluetoothDevice device = mLeDevices.get(i);
