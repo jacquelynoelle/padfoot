@@ -129,23 +129,22 @@ public class BluetoothLeService extends Service {
                                  final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
 
+        // TODO: Move Firebase specific stuff out of the service
+        // TODO: consider using LocalBroadcastManager.sendBroadcast, or use permissions
+        // more info here: https://developer.android.com/guide/components/broadcasts
         database = FirebaseDatabase.getInstance().getReference();
 
         // Special handling for Step Count characteristic
         if (UUID_STEP_COUNT.equals(characteristic.getUuid())) {
-            int flag = characteristic.getProperties();
-            int format = -1;
-            if ((flag & 0x01) != 0) {
-                format = BluetoothGattCharacteristic.FORMAT_UINT16;
-                Log.d(TAG, "Heart rate format UINT16.");
-            } else {
-                format = BluetoothGattCharacteristic.FORMAT_UINT8;
-                Log.d(TAG, "Heart rate format UINT8.");
-            }
-            final int heartRate = characteristic.getIntValue(format, 1);
-            Log.d(TAG, String.format("Received heart rate: %d", heartRate));
-            intent.putExtra(EXTRA_DATA, String.valueOf(heartRate));
-            database.push().setValue(heartRate);
+//            int flag = characteristic.getProperties();
+
+            int format = BluetoothGattCharacteristic.FORMAT_UINT16;
+            Log.d(TAG, "Heart rate format UINT16.");
+
+            final int stepCount = characteristic.getIntValue(format, 1);
+            Log.d(TAG, String.format("Received step count: %d", stepCount));
+            intent.putExtra(EXTRA_DATA, String.valueOf(stepCount));
+            database.push().setValue(stepCount);
         } else {
             // For all other profiles, writes the data formatted in HEX.
             final byte[] data = characteristic.getValue();

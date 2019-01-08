@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" android:opacity="opaque">
+    <!-- the background color -->
+    <item android:drawable="@color/colorPrimary"/>
+    <!-- product logo - 144dp color version of your app icon -->
+    <item
+        android:text="@string/app_name"
+        android:gravity="center" />
+</layer-list>
