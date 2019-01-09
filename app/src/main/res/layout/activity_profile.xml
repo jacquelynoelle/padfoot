@@ -87,6 +87,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/profile_submit"
             android:text="@string/submit"
             android:gravity="center_horizontal"/>
     </LinearLayout>

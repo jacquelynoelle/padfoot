@@ -14,4 +14,12 @@
         <item name="android:windowBackground">@drawable/launch_screen</item>
     </style>
 
+    <!-- Fullscreen theme -->
+    <style name="FullScreen" parent="@style/Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
 </resources>

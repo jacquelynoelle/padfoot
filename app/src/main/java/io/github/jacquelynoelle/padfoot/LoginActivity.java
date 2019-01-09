@@ -4,12 +4,8 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
-// firebase auth
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -41,7 +37,11 @@ public class LoginActivity extends AppCompatActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
-                    onSignedInInitialize(user.getDisplayName());
+                    onSignedInInitialize(user);
+                    // TODO: Check for pet profile setup and BLE connection
+                    Intent signedInIntent = new Intent(LoginActivity.this, MainActivity.class);
+                    signedInIntent.putExtra("username", mUsername);
+                    startActivity(signedInIntent);
                 } else {
                     // User is signed out
                     onSignedOutCleanup();
@@ -61,29 +61,12 @@ public class LoginActivity extends AppCompatActivity {
         };
     }
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        menu.findItem(R.id.menu_ble).setVisible(true);
-        menu.findItem(R.id.sign_out_menu).setVisible(true);
-        return true;
+    private void onSignedInInitialize(FirebaseUser user) {
+        mUsername = user.getDisplayName();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_ble:
-                final Intent intent = new Intent(this, DeviceScanActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.sign_out_menu:
-                AuthUI.getInstance().signOut(this);
-                break;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-        return true;
+    private void onSignedOutCleanup() {
+        mUsername = ANONYMOUS;
     }
 
     @Override
@@ -92,17 +75,21 @@ public class LoginActivity extends AppCompatActivity {
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
                 // Sign-in succeeded, set up the UI
-                FirebaseUserMetadata metadata = mFirebaseAuth.getCurrentUser().getMetadata();
+                // TODO: Check for pet profile setup and BLE connection
+                FirebaseUser user = mFirebaseAuth.getCurrentUser();
+                FirebaseUserMetadata metadata = user.getMetadata();
+                onSignedInInitialize(user);
                 if (metadata.getCreationTimestamp() == metadata.getLastSignInTimestamp()) {
-                    Intent loginNewUser = new Intent(this, ProfileActivity.class);
+                    Intent loginNewUser = new Intent(LoginActivity.this, ProfileActivity.class);
+                    loginNewUser.putExtra("username", mUsername);
                     startActivity(loginNewUser);
-//                      Toast.makeText(this, "Welcome to Padfoot!", Toast.LENGTH_SHORT).show();
+                    // Toast.makeText(this, "Welcome to Padfoot!", Toast.LENGTH_SHORT).show();
                 } else {
-                    Intent loginExistingUser = new Intent(this, MainActivity.class);
+                    Intent loginExistingUser = new Intent(LoginActivity.this, MainActivity.class);
+                    loginExistingUser.putExtra("username", mUsername);
                     startActivity(loginExistingUser);
-//                    mUsername = mFirebaseAuth.getCurrentUser().getDisplayName();
-//                    String greeting = "Welcome back, " + mUsername;
-//                    Toast.makeText(this, greeting, Toast.LENGTH_SHORT).show();
+                    // String greeting = "Welcome back, " + mUsername;
+                    // Toast.makeText(this, greeting, Toast.LENGTH_SHORT).show();
                 }
             } else if (resultCode == RESULT_CANCELED) {
                 // Sign in was canceled by the user, finish the activity
@@ -111,22 +98,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
     }
-
-
-    // TODO: remove or use -- more on sign out
-//    public void onClick(View v) {
-//        if (v.getId() == R.id.sign_out) {
-//            AuthUI.getInstance()
-//                    .signOut(this)
-//                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                        public void onComplete(@NonNull Task<Void> task) {
-//                            // user is now signed out
-//                            startActivity(new Intent(MyActivity.this, SignInActivity.class));
-//                            finish();
-//                        }
-//                    });
-//        }
-//    }
 
     @Override
     protected void onResume() {
@@ -141,14 +112,4 @@ public class LoginActivity extends AppCompatActivity {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
     }
-
-    private void onSignedInInitialize(String username) {
-        mUsername = username;
-    }
-
-    private void onSignedOutCleanup() {
-        mUsername = ANONYMOUS;
-    }
-
-
 }

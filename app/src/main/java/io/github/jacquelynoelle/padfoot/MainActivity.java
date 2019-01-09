@@ -94,14 +94,6 @@ public class MainActivity extends AppCompatActivity {
         detachDatabaseReadListener();
     }
 
-    private void onSignedInInitialize(String username) {
-        attachDatabaseReadListener();
-    }
-
-    private void onSignedOutCleanup() {
-        detachDatabaseReadListener();
-    }
-
     private void attachDatabaseReadListener() {
         // eventListener for updates to database
         eventListener = new ChildEventListener() {
