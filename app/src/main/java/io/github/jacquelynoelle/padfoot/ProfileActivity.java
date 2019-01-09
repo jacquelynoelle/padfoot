@@ -8,13 +8,16 @@ import android.widget.Spinner;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    Spinner petSizeSpinner = (Spinner) findViewById(R.id.pet_size_dropdown);
-    AutoCompleteTextView breedTextView = (AutoCompleteTextView) findViewById(R.id.breed_edit_text);
+    Spinner petSizeSpinner;
+    AutoCompleteTextView breedTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        petSizeSpinner = findViewById(R.id.pet_size_dropdown);
+        breedTextView = findViewById(R.id.breed_edit_text);
 
         petSizeSpinner.setAdapter(new ArrayAdapter<PetSize>(this,
                 android.R.layout.simple_spinner_item, PetSize.values()));

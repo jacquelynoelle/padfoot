@@ -39,7 +39,7 @@
     </string>
 
     <!-- Profile strings -->
-    <string name="profile_setup">Create your pet's profile</string>
+    <string name="profile_setup">Create your pet\'s profile</string>
     <string name="profile_pet_name">Pet name</string>
     <string name="profile_pet_name_example">Fido</string>
     <string name="profile_size">Size</string>
