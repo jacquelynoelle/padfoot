@@ -1,16 +1,23 @@
 package io.github.jacquelynoelle.padfoot;
 
 public enum PetSize {
-    TOY("Up to 12 lbs"),
-    SMALL("12 to 25 lbs"),
-    MEDIUM("25 to 50 lbs"),
-    LARGE("50 to 100 lbs"),
-    EXTRA_LARGE("Over 100 lbs");
+    TOY("Toy", "<12 pounds"),
+    SMALL("Small", "12-25 pounds"),
+    MEDIUM("Medium", "25-50 pounds"),
+    LARGE("Large", "50-100 pounds"),
+    EXTRA_LARGE("Extra large", ">100 pounds");
 
+    private String label;
     private String description;
 
-    PetSize(String description) {
+    PetSize(String label, String description) {
+        this.label = label;
         this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return this.label;
     }
 
     public String getDescription() {

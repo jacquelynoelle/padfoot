@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Padfoot</string>
+
+    <!-- BLE strings -->
     <string name="ble_not_supported">BLE is not supported</string>
     <string name="label_data">Data:</string>
     <string name="label_device_address">Device address:</string>
@@ -35,4 +37,25 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+
+    <!-- Profile strings -->
+    <string name="profile_setup">Create your pet's profile</string>
+    <string name="profile_pet_name">Pet name</string>
+    <string name="profile_pet_name_example">Fido</string>
+    <string name="profile_size">Size</string>
+    <string name="profile_breed">Breed</string>
+    <string name="profile_breed_example">Australian Shepherd</string>
+    <string name="profile_birthday">Birthday</string>
+    <string-array name="breeds_array">
+        <item>Australian Shepherd</item>
+        <item>Border Collie</item>
+        <item>Golden Retriever</item>
+        <item>Labrador Retriever</item>
+    </string-array>
+
+
+    <!-- Utility strings -->
+    <string name="submit">Submit</string>
+    <string name="select">Select</string>
+    <string name="current_year">2019</string>
 </resources>

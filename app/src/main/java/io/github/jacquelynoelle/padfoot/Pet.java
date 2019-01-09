@@ -2,15 +2,22 @@ package io.github.jacquelynoelle.padfoot;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 @IgnoreExtraProperties
 public class Pet {
 
     private String name;
     private String ownerID;
-    private String breed;
     private PetSize size;
+    private String breed;
+    private Date birthday;
     private ArrayList challenges;
+
+    /* Two constructors:
+     * - Default
+     * - One argument (name) because that is the only required field upon sign up.
+     */
 
     public Pet() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
@@ -18,20 +25,6 @@ public class Pet {
 
     public Pet(String name) {
         this.name = name;
-        this.breed = "Unknown";
-        this.size = PetSize.MEDIUM;
-    }
-
-    public Pet(String name, String breed) {
-        this.name = name;
-        this.breed = breed;
-        this.size = PetSize.MEDIUM;
-    }
-
-    public Pet(String name, String breed, PetSize size) {
-        this.name = name;
-        this.breed = breed;
-        this.size = size;
     }
 
     public String getName() {
@@ -46,6 +39,18 @@ public class Pet {
         return ownerID;
     }
 
+    public PetSize getSize() {
+        return size;
+    }
+
+    public void setSize(PetSize size) {
+        if (size == null) {
+            this.size = PetSize.MEDIUM;
+        } else {
+            this.size = size;
+        }
+    }
+
     public String getBreed() {
         return breed;
     }
@@ -54,12 +59,12 @@ public class Pet {
         this.breed = breed;
     }
 
-    public PetSize getSize() {
-        return size;
+    public Date getBirthday() {
+        return birthday;
     }
 
-    public void setSize(PetSize size) {
-        this.size = size;
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
     }
 
     public ArrayList getChallenges() {
