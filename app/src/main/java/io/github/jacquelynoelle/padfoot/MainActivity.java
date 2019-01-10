@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +26,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final static String TAG = MainActivity.class.getSimpleName();
     private Button button;
     private EditText editText;
     private TextView displayText;
@@ -37,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Log.i(TAG, "onCreate");
+
         button = findViewById(R.id.button_01);
         editText = findViewById(R.id.edit_text_01);
         displayText = findViewById(R.id.text_view_01);
@@ -45,16 +49,16 @@ public class MainActivity extends AppCompatActivity {
 
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                String petName = editText.getText().toString();
-
-//                String newPetID = writeNewPet(petName);
-//                displayText.setText(petName);
-
-                Pet newPet = new Pet(petName);
-
-                database.push().setValue(newPet);
-
-                editText.getText().clear();
+//                String petName = editText.getText().toString();
+//
+////                String newPetID = writeNewPet(petName);
+////                displayText.setText(petName);
+//
+//                Pet newPet = new Pet(petName);
+//
+//                database.push().setValue(newPet);
+//
+//                editText.getText().clear();
             }
         });
     }

@@ -9,9 +9,9 @@ public class Pet {
 
     private String name;
     private String ownerID;
-    private PetSize size;
+    private String size;
     private String breed;
-    private Date birthday;
+    private String birthday;
     private ArrayList challenges;
 
     /* Two constructors:
@@ -23,8 +23,9 @@ public class Pet {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public Pet(String name) {
+    public Pet(String name, String ownerID) {
         this.name = name;
+        this.ownerID = ownerID;
     }
 
     public String getName() {
@@ -39,13 +40,13 @@ public class Pet {
         return ownerID;
     }
 
-    public PetSize getSize() {
+    public String getSize() {
         return size;
     }
 
-    public void setSize(PetSize size) {
+    public void setSize(String size) {
         if (size == null) {
-            this.size = PetSize.MEDIUM;
+            this.size = "Medium";
         } else {
             this.size = size;
         }
@@ -59,11 +60,11 @@ public class Pet {
         this.breed = breed;
     }
 
-    public Date getBirthday() {
+    public String getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(Date birthday) {
+    public void setBirthday(String birthday) {
         this.birthday = birthday;
     }
 

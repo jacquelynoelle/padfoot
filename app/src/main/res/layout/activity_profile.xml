@@ -8,87 +8,94 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/profile_setup"
-        android:textSize="24sp" />
+        android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/profile_form"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <!-- Pet name -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="16dp"
-            android:text="@string/profile_pet_name"
-            android:textAllCaps="true" />
-
-        <EditText
+        <LinearLayout
+            android:id="@+id/profile_form"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/profile_pet_name_example"
-            android:paddingTop="16dp" />
+            android:orientation="vertical">
 
-        <!-- Size -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="16dp"
-            android:text="@string/profile_size"
-            android:textAllCaps="true" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/profile_setup"
+                android:textSize="24sp" />
 
-        <Spinner
-            android:id="@+id/pet_size_dropdown"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/select"
-            android:paddingTop="16dp"
-            android:prompt="@string/select"
-            android:spinnerMode="dropdown" />
+            <!-- Pet name -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:text="@string/profile_pet_name"
+                android:textAllCaps="true" />
 
-        <!-- Breed -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="16dp"
-            android:text="@string/profile_breed"
-            android:textAllCaps="true" />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/profile_pet_name_example"
+                android:id="@+id/et_name"
+                android:paddingTop="16dp" />
 
-        <AutoCompleteTextView
-            android:id="@+id/breed_edit_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:completionThreshold="1"
-            android:hint="@string/profile_breed_example"
-            android:paddingTop="16dp" />
+            <!-- Size -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:text="@string/profile_size"
+                android:textAllCaps="true" />
 
-        <!-- Birthday -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="16dp"
-            android:text="@string/profile_birthday"
-            android:textAllCaps="true" />
+            <Spinner
+                android:id="@+id/sp_pet_size"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/select"
+                android:paddingTop="16dp"
+                android:prompt="@string/select"
+                android:spinnerMode="dropdown" />
 
-        <DatePicker
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:calendarViewShown="false"
-            android:datePickerMode="spinner"
-            android:endYear="@string/current_year"
-            android:paddingTop="16dp"
-            android:startYear="2000" />
+            <!-- Breed -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:text="@string/profile_breed"
+                android:textAllCaps="true" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/profile_submit"
-            android:text="@string/submit"
-            android:gravity="center_horizontal"/>
-    </LinearLayout>
+            <AutoCompleteTextView
+                android:id="@+id/ac_breed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:completionThreshold="1"
+                android:hint="@string/profile_breed_example"
+                android:paddingTop="16dp" />
+
+            <!-- Birthday -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:text="@string/profile_birthday"
+                android:textAllCaps="true" />
+
+            <DatePicker
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/dp_birthday"
+                android:calendarViewShown="false"
+                android:datePickerMode="spinner"
+                android:endYear="@string/current_year"
+                android:paddingTop="16dp"
+                android:startYear="2000" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/b_profile_submit"
+                android:text="@string/submit"
+                android:gravity="center_horizontal"/>
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>

@@ -8,12 +8,6 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <!-- Launcher theme -->
-    <style name="AppTheme.Launcher">
-        <item name="colorPrimaryDark">@color/colorPrimary</item>
-        <item name="android:windowBackground">@drawable/launch_screen</item>
-    </style>
-
     <!-- Fullscreen theme -->
     <style name="FullScreen" parent="@style/Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowNoTitle">true</item>

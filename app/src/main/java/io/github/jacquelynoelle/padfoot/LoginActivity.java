@@ -4,28 +4,45 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.FirebaseUserMetadata;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
 
+    private final static String TAG = LoginActivity.class.getSimpleName();
+
     // firebase auth
     public static final int RC_SIGN_IN = 2;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
-    private String mUsername;
-    public static final String ANONYMOUS = "anonymous";
+    private User currentUser;
+
+    // firebase database
+    FirebaseDatabase database;
+    DatabaseReference usersReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i(TAG, "onCreate");
+
+        // initialize firebase database and references
+        database = FirebaseDatabase.getInstance();
+        usersReference = database.getReference("users");
 
         // initialize firebase auth instance
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -34,16 +51,23 @@ public class LoginActivity extends AppCompatActivity {
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
+                Log.i(TAG, "onAuthStateChanged");
+                final FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
-                    onSignedInInitialize(user);
-                    // TODO: Check for pet profile setup and BLE connection
-                    Intent signedInIntent = new Intent(LoginActivity.this, MainActivity.class);
-                    signedInIntent.putExtra("username", mUsername);
-                    startActivity(signedInIntent);
+                    Log.i(TAG, "onAuthStateChanged: user is signed in - start");
+                    onReturningUserLogin(user, new FirebaseCallback() {
+                        @Override
+                        public void onCallback(String value) {
+                            Log.i("TAG", "onCallback");
+                            currentUser = new User(user.getDisplayName(), value);
+                            routeUser(user);
+                        }
+                    });
+                    Log.i(TAG, "onAuthStateChanged: user is signed in - finish");
                 } else {
                     // User is signed out
+                    Log.i(TAG, "onAuthStateChanged: user is not signed in");
                     onSignedOutCleanup();
                     final List<AuthUI.IdpConfig> providers = Arrays.asList(
                             new AuthUI.IdpConfig.GoogleBuilder().build(),
@@ -61,13 +85,54 @@ public class LoginActivity extends AppCompatActivity {
         };
     }
 
-    private void onSignedInInitialize(FirebaseUser user) {
-        mUsername = user.getDisplayName();
+    private void onReturningUserLogin(final FirebaseUser firebaseUser, final FirebaseCallback callback) {
+        Log.i(TAG, "onReturningUserLogin: start");
+        ValueEventListener listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.i(TAG, "onReturningUserLogin: onDataChange - start");
+                String petID = dataSnapshot.child("petID").getValue(String.class);
+                callback.onCallback(petID);
+                Log.i(TAG, "onReturningUserLogin: onDataChange - finish");
+
+//                String name = dataSnapshot.child("name").getValue(String.class);
+//                currentUser.setName(name);
+//
+//                String petID = dataSnapshot.child("petID").getValue(String.class);
+//                currentUser.setPetID(petID);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w(TAG, "onReturningUserLogin: onCancelled", databaseError.toException());
+            }
+        };
+        usersReference.child(firebaseUser.getUid()).addListenerForSingleValueEvent(listener);
+        Log.i(TAG, "onReturningUserLogin: finish");
     }
 
     private void onSignedOutCleanup() {
-        mUsername = ANONYMOUS;
+        currentUser = null;
     }
+
+    private void routeUser(FirebaseUser firebaseUser) {
+        // TODO: Check BLE connection
+        if (currentUser.getPetID() != null) {
+            Log.i(TAG, "routeUser: already setup pet profile");
+            Intent signedInIntent = new Intent(LoginActivity.this, MainActivity.class);
+            signedInIntent.putExtra("userID", firebaseUser.getUid());
+            signedInIntent.putExtra("petID", currentUser.getPetID());
+            startActivity(signedInIntent);
+        } else {
+            Log.i(TAG, "routeUser: already setup pet profile");
+            Intent loginNewUser = new Intent(LoginActivity.this, ProfileActivity.class);
+            loginNewUser.putExtra("userID", firebaseUser.getUid());
+            startActivity(loginNewUser);
+        }
+        Log.i(TAG, "routeUser: finish");
+        finish();
+    }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -75,25 +140,28 @@ public class LoginActivity extends AppCompatActivity {
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
                 // Sign-in succeeded, set up the UI
-                // TODO: Check for pet profile setup and BLE connection
-                FirebaseUser user = mFirebaseAuth.getCurrentUser();
-                FirebaseUserMetadata metadata = user.getMetadata();
-                onSignedInInitialize(user);
-                if (metadata.getCreationTimestamp() == metadata.getLastSignInTimestamp()) {
-                    Intent loginNewUser = new Intent(LoginActivity.this, ProfileActivity.class);
-                    loginNewUser.putExtra("username", mUsername);
-                    startActivity(loginNewUser);
-                    // Toast.makeText(this, "Welcome to Padfoot!", Toast.LENGTH_SHORT).show();
+                IdpResponse response = IdpResponse.fromResultIntent(data);
+                final FirebaseUser user = mFirebaseAuth.getCurrentUser();
+//                FirebaseUserMetadata metadata = user.getMetadata();
+                if (response.isNewUser()) {
+                    Log.i(TAG, "onActivityResult: new user");
+                    currentUser = new User(user.getDisplayName(), null);
+                    usersReference.child(user.getUid()).setValue(currentUser);
+                    routeUser(user);
                 } else {
-                    Intent loginExistingUser = new Intent(LoginActivity.this, MainActivity.class);
-                    loginExistingUser.putExtra("username", mUsername);
-                    startActivity(loginExistingUser);
-                    // String greeting = "Welcome back, " + mUsername;
-                    // Toast.makeText(this, greeting, Toast.LENGTH_SHORT).show();
+                    Log.i(TAG, "onActivityResult: existing user");
+                    onReturningUserLogin(user, new FirebaseCallback() {
+                        @Override
+                        public void onCallback(String value) {
+                            Log.i("TAG", "onCallback");
+                            currentUser = new User(user.getDisplayName(), value);
+                            routeUser(user);
+                        }
+                    });
                 }
             } else if (resultCode == RESULT_CANCELED) {
                 // Sign in was canceled by the user, finish the activity
-                Toast.makeText(this, "Sign in canceled", Toast.LENGTH_SHORT).show();
+                Log.i(TAG, "onActivityResult: login cancelled");
                 finish();
             }
         }
