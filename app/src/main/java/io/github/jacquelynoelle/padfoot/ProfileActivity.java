@@ -87,6 +87,8 @@ public class ProfileActivity extends AppCompatActivity {
                 break;
             case R.id.sign_out_menu:
                 AuthUI.getInstance().signOut(this);
+                Intent signOutIntent = new Intent(this, LoginActivity.class);
+                startActivity(signOutIntent);
                 break;
             default:
                 return super.onOptionsItemSelected(item);
