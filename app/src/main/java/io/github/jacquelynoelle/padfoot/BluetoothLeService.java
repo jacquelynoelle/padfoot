@@ -136,10 +136,16 @@ public class BluetoothLeService extends Service {
 
         // Special handling for Step Count characteristic
         if (UUID_STEP_COUNT.equals(characteristic.getUuid())) {
-//            int flag = characteristic.getProperties();
-
-            int format = BluetoothGattCharacteristic.FORMAT_UINT16;
-            Log.d(TAG, "Heart rate format UINT16.");
+            int flag = characteristic.getProperties();
+            int format;
+            if ((flag & 0x01) != 0) {
+                format = BluetoothGattCharacteristic.FORMAT_UINT16;
+                Log.d(TAG, "Step count format UINT16.");
+            } else {
+                format = BluetoothGattCharacteristic.FORMAT_UINT8;
+                Log.d(TAG, "Step count format UINT8.");
+                // TODO: Not sure why it's coming through as an 8-bit integer instead of 16
+            }
 
             final int stepCount = characteristic.getIntValue(format, 1);
             Log.d(TAG, String.format("Received step count: %d", stepCount));
