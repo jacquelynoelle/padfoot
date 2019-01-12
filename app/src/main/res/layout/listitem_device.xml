@@ -13,11 +13,13 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingTop="16dp" >
     <TextView android:id="@+id/device_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -26,4 +28,4 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="12dp"/>
-</FrameLayout>
+</LinearLayout>

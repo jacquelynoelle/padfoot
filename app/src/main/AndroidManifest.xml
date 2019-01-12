@@ -23,7 +23,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity" />
-        <activity android:name=".DeviceScanActivity" />
         <activity android:name=".DeviceControlActivity" />
 
         <service
