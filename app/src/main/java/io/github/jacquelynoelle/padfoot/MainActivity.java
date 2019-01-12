@@ -27,8 +27,6 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private final static String TAG = MainActivity.class.getSimpleName();
-    private Button button;
-    private EditText editText;
     private TextView displayText;
     private DatabaseReference database;
     private ChildEventListener eventListener;
@@ -41,26 +39,9 @@ public class MainActivity extends AppCompatActivity {
 
         Log.i(TAG, "onCreate");
 
-        button = findViewById(R.id.button_01);
-        editText = findViewById(R.id.edit_text_01);
-        displayText = findViewById(R.id.text_view_01);
+        displayText = findViewById(R.id.tv_step_count);
         database = FirebaseDatabase.getInstance().getReference();
         // can do the reference separately to get focused parts
-
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-//                String petName = editText.getText().toString();
-//
-////                String newPetID = writeNewPet(petName);
-////                displayText.setText(petName);
-//
-//                Pet newPet = new Pet(petName);
-//
-//                database.push().setValue(newPet);
-//
-//                editText.getText().clear();
-            }
-        });
     }
 
     @Override
