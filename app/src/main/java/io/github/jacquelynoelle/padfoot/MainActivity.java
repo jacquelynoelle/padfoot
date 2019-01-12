@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_ble:
-                final Intent intent = new Intent(this, DeviceScanActivity.class);
+                final Intent intent = new Intent(this, BLEScanActivity.class);
                 startActivity(intent);
                 break;
             case R.id.sign_out_menu:
