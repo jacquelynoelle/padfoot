@@ -164,8 +164,10 @@ public class BLEScanActivity extends AppCompatActivity
         final Intent intent = new Intent(this, BLEService.class);
         intent.putExtra(EXTRAS_DEVICE_NAME, device.getName());
         intent.putExtra(EXTRAS_DEVICE_ADDRESS, device.getAddress());
-
         startService(intent);
+
+        final Intent returnToStepCount = new Intent(this, MainActivity.class);
+        startActivity(returnToStepCount);
     }
 
     private void scanLeDevice(final boolean enable) {
