@@ -15,7 +15,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -162,7 +161,7 @@ public class BLEScanActivity extends AppCompatActivity
             mScanning = false;
         }
 
-        final Intent intent = new Intent(this, BleService.class);
+        final Intent intent = new Intent(this, BLEService.class);
         intent.putExtra(EXTRAS_DEVICE_NAME, device.getName());
         intent.putExtra(EXTRAS_DEVICE_ADDRESS, device.getAddress());
 

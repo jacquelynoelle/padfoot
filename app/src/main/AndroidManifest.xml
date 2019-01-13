@@ -23,10 +23,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity" />
-        <activity android:name=".DeviceControlActivity" />
 
         <service
-            android:name=".BleService"
+            android:name=".BLEService"
             android:enabled="true" />
 
         <activity android:name=".ProfileActivity" />

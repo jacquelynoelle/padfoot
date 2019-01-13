@@ -4,15 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,9 +19,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import com.firebase.ui.auth.AuthUI;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -122,22 +115,22 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
-            if (BleService.ACTION_GATT_CONNECTED.equals(action)) {
+            if (BLEService.ACTION_GATT_CONNECTED.equals(action)) {
                 Toast toast = Toast.makeText(getApplicationContext(),
                         R.string.connected,
                         Toast.LENGTH_SHORT);
                 toast.show();
-            } else if (BleService.ACTION_GATT_DISCONNECTED.equals(action)) {
+            } else if (BLEService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 Toast toast = Toast.makeText(getApplicationContext(),
                         R.string.disconnected,
                         Toast.LENGTH_SHORT);
                 toast.show();
-            } else if (BleService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
+            } else if (BLEService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 Toast toast = Toast.makeText(getApplicationContext(),
                         "BLE service discovered",
                         Toast.LENGTH_SHORT);
                 toast.show();
-            } else if (BleService.ACTION_DATA_AVAILABLE.equals(action)) {
+            } else if (BLEService.ACTION_DATA_AVAILABLE.equals(action)) {
                 Toast toast = Toast.makeText(getApplicationContext(),
                        "Data streaming",
                         Toast.LENGTH_SHORT);
@@ -148,10 +141,10 @@ public class MainActivity extends AppCompatActivity {
 
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
-        intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
+        intentFilter.addAction(BLEService.ACTION_GATT_CONNECTED);
+        intentFilter.addAction(BLEService.ACTION_GATT_DISCONNECTED);
+        intentFilter.addAction(BLEService.ACTION_GATT_SERVICES_DISCOVERED);
+        intentFilter.addAction(BLEService.ACTION_DATA_AVAILABLE);
         return intentFilter;
     }
 }

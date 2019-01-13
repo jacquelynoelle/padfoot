@@ -21,9 +21,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.List;
 import java.util.UUID;
 
-public class BleService extends Service {
+public class BLEService extends Service {
 
-    private final static String TAG = BluetoothLeService.class.getSimpleName();
+    private final static String TAG = BLEService.class.getSimpleName();
 
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
@@ -151,8 +151,20 @@ public class BleService extends Service {
             Log.w(TAG, "BluetoothAdapter not initialized");
             return;
         }
-        mBluetoothGatt.disconnect();
+        mBluetoothGatt.disconnect(); // TODO create menu item for this
     }
+
+    /**
+     * After using a given BLE device, the app must call this method to ensure resources are
+     * released properly.
+     */
+//    public void close() {
+//        if (mBluetoothGatt == null) {
+//            return;
+//        }
+//        mBluetoothGatt.close(); // TODO call this in disconnect? or perhaps in separate menu item
+//        mBluetoothGatt = null;
+//    }
 
     /**
      * Request a read on a given {@code BluetoothGattCharacteristic}. The read result is reported
