@@ -26,7 +26,7 @@
         <activity android:name=".DeviceControlActivity" />
 
         <service
-            android:name=".BluetoothLeService"
+            android:name=".BleService"
             android:enabled="true" />
 
         <activity android:name=".ProfileActivity" />

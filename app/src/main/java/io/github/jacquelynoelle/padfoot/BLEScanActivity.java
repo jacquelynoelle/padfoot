@@ -33,7 +33,8 @@ public class BLEScanActivity extends AppCompatActivity
 
     private static final int REQUEST_ENABLE_BT = 1;
     private static final long SCAN_PERIOD = 10000; // Stops scanning after 10 seconds.
-    private Toast mToast;
+    public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
+    public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,15 +157,16 @@ public class BLEScanActivity extends AppCompatActivity
         final BluetoothDevice device = mAdapter.getDevice(clickedItemIndex);
         if (device == null) return;
 
-        final Intent intent = new Intent(this, DeviceControlActivity.class);
-        intent.putExtra(DeviceControlActivity.EXTRAS_DEVICE_NAME, device.getName());
-        intent.putExtra(DeviceControlActivity.EXTRAS_DEVICE_ADDRESS, device.getAddress());
-
         if (mScanning) {
             mBluetoothScanner.stopScan(mLeScanCallback);
             mScanning = false;
         }
-        startActivity(intent);
+
+        final Intent intent = new Intent(this, BleService.class);
+        intent.putExtra(EXTRAS_DEVICE_NAME, device.getName());
+        intent.putExtra(EXTRAS_DEVICE_ADDRESS, device.getAddress());
+
+        startService(intent);
     }
 
     private void scanLeDevice(final boolean enable) {
