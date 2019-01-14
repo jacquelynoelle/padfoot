@@ -11,7 +11,7 @@
         android:id="@+id/tv_step_count_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Today's step count:"
+        android:text="@string/step_count_header"
         android:textSize="24sp"
         android:gravity="center"
         />
@@ -20,7 +20,7 @@
         android:id="@+id/tv_step_count"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="[ step count ]"
+        android:text="@string/step_count_placeholder"
         android:textSize="48sp"
         android:textColor="@color/colorPrimary"
         android:gravity="center"

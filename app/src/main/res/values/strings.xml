@@ -53,9 +53,12 @@
         <item>Labrador Retriever</item>
     </string-array>
 
-
     <!-- Utility strings -->
     <string name="submit">Submit</string>
     <string name="select">Select</string>
     <string name="current_year">2019</string>
+
+    <!-- Main Activity strings -->
+    <string name="step_count_header">Today\'s step count:</string>
+    <string name="step_count_placeholder">No steps yet!</string>
 </resources>
