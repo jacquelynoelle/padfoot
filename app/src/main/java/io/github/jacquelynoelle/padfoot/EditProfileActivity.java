@@ -183,7 +183,7 @@ public class EditProfileActivity extends AppCompatActivity {
                 break;
             case R.id.menu_sign_out:
                 AuthUI.getInstance().signOut(this);
-                Intent signOutIntent = new Intent(this, LoginActivity.class);
+                Intent signOutIntent = new Intent(this, SplashActivity.class);
                 startActivity(signOutIntent);
                 break;
             default:

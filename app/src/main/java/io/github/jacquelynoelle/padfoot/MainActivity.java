@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
                         .signOut(this)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             public void onComplete(@NonNull Task<Void> task) {
-                                Intent signOutIntent = new Intent(MainActivity.this, LoginActivity.class);
+                                Intent signOutIntent = new Intent(MainActivity.this, SplashActivity.class);
                                 startActivity(signOutIntent);
                             }
                         });
