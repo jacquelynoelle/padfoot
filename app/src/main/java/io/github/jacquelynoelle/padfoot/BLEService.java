@@ -317,18 +317,21 @@ public class BLEService extends Service {
 
         // Special handling for Step Count characteristic
         if (SampleGattAttributes.STEP_COUNT.equals(characteristic.getUuid().toString())) {
-            int flag = characteristic.getProperties();
-            int format;
-            if ((flag & 0x01) != 0) {
-                format = BluetoothGattCharacteristic.FORMAT_UINT16;
-                Log.d(TAG, "Step count format UINT16.");
-            } else {
-                format = BluetoothGattCharacteristic.FORMAT_UINT8;
-                Log.d(TAG, "Step count format UINT8.");
-                // TODO: Not sure why it's coming through as an 8-bit integer instead of 16
-            }
+//            TODO: Not sure why it was coming through as an 8-bit integer instead of 16
+//                TODO: Likely need to figure out sending through array to use timestamps
+//            int flag = characteristic.getProperties();
+//            int format;
+//            if ((flag & 0x01) != 0) {
+//                format = BluetoothGattCharacteristic.FORMAT_UINT16;
+//                Log.d(TAG, "Step count format UINT16.");
+//            } else {
+//                format = BluetoothGattCharacteristic.FORMAT_UINT8;
+//                Log.d(TAG, "Step count format UINT8.");
+//            }
+            int format = BluetoothGattCharacteristic.FORMAT_UINT16;
 
-            final int stepCount = characteristic.getIntValue(format, 1);
+
+            final int stepCount = characteristic.getIntValue(format, 0);
             Log.d(TAG, String.format("Received step count: %d", stepCount));
             intent.putExtra(EXTRA_DATA, String.valueOf(stepCount));
             database.child("test-data").push().setValue(stepCount); // TODO update to specific pet
