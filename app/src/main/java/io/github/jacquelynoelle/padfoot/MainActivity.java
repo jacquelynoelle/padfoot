@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView displayText;
     private DatabaseReference database;
     private ChildEventListener eventListener;
+    private Integer mStepCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+        attachDatabaseReadListener();
         super.onResume();
     }
 
@@ -84,9 +86,8 @@ public class MainActivity extends AppCompatActivity {
         eventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                Pet newPet = dataSnapshot.getValue(Pet.class); // not working when most recent data is not a Pet object
-//                String newText = "Added pet: " + newPet.name;
-//                displayText.setText(newText);
+                mStepCount = dataSnapshot.getValue(Integer.class); // not working when most recent data is not a Pet object
+                displayText.setText(mStepCount.toString());
             }
 
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
@@ -95,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {}
         };
 
-        database.addChildEventListener(eventListener);
+        database.child("test-data").addChildEventListener(eventListener);
     }
 
     private void detachDatabaseReadListener() {
