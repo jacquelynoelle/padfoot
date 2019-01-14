@@ -13,7 +13,7 @@ public class SplashActivity extends AppCompatActivity {
         setTheme(R.style.FullScreen);
         setContentView(R.layout.activity_splash);
 
-        final int SPLASH_DURATION = 1000;  // show splash for 1s
+        final int SPLASH_DURATION = 500;  // show splash for .5s
         showSplashScreen(SPLASH_DURATION);
     }
 

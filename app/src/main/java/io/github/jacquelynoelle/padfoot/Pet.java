@@ -3,6 +3,8 @@ import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @IgnoreExtraProperties
 public class Pet {
@@ -75,4 +77,15 @@ public class Pet {
     public void addChallenge(Challenge challenge) {
         challenges.add(challenge);
     }
+
+    public HashMap<String, Object> toMap() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("name", name);
+        map.put("size", size);
+        map.put("breed", breed);
+        map.put("birthday", birthday);
+
+        return map;
+    }
+
 }

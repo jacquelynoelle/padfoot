@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +13,8 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -44,22 +47,38 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-        menu.findItem(R.id.menu_ble).setVisible(true);
-        menu.findItem(R.id.sign_out_menu).setVisible(true);
+        menu.findItem(R.id.menu_connect).setVisible(true);
+        menu.findItem(R.id.menu_disconnect).setVisible(true);
+        menu.findItem(R.id.menu_edit_profile).setVisible(true);
+        menu.findItem(R.id.menu_sign_out).setVisible(true);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_ble:
-                final Intent intent = new Intent(this, BLEScanActivity.class);
-                startActivity(intent);
+            case R.id.menu_connect:
+                final Intent bleConnectIntent = new Intent(this, BLEScanActivity.class);
+                startActivity(bleConnectIntent);
                 break;
-            case R.id.sign_out_menu:
-                AuthUI.getInstance().signOut(this);
-                Intent signOutIntent = new Intent(this, LoginActivity.class);
-                startActivity(signOutIntent);
+            case R.id.menu_disconnect:
+                final Intent bleDisconnectIntent = new Intent(this, BLEScanActivity.class);
+                startActivity(bleDisconnectIntent);
+                break;
+            case R.id.menu_edit_profile:
+                final Intent editProfileIntent = new Intent(this, EditProfileActivity.class);
+                editProfileIntent.putExtra("petID", getIntent().getStringExtra("petID"));
+                startActivity(editProfileIntent);
+                break;
+            case R.id.menu_sign_out:
+                AuthUI.getInstance()
+                        .signOut(this)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            public void onComplete(@NonNull Task<Void> task) {
+                                Intent signOutIntent = new Intent(MainActivity.this, LoginActivity.class);
+                                startActivity(signOutIntent);
+                            }
+                        });
                 break;
             default:
                 return super.onOptionsItemSelected(item);

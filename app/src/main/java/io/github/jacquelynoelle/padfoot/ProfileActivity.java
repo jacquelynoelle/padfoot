@@ -35,6 +35,7 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setTitle(getString(R.string.profile_setup));
         setContentView(R.layout.activity_profile);
 
         database = FirebaseDatabase.getInstance();
@@ -73,19 +74,14 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-        menu.findItem(R.id.menu_ble).setVisible(true);
-        menu.findItem(R.id.sign_out_menu).setVisible(true);
+        menu.findItem(R.id.menu_sign_out).setVisible(true);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_ble:
-                final Intent intent = new Intent(this, BLEScanActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.sign_out_menu:
+            case R.id.menu_sign_out:
                 AuthUI.getInstance().signOut(this);
                 Intent signOutIntent = new Intent(this, LoginActivity.class);
                 startActivity(signOutIntent);
@@ -117,9 +113,10 @@ public class ProfileActivity extends AppCompatActivity {
         String ownerID = getIntent().getStringExtra("userID");
         Pet newPet = new Pet(petName, ownerID);
         newPet.setSize(petSize);
-        if (!petBreed.equals("")) {
-            newPet.setBreed("Dog");
+        if (petBreed.equals("")) {
+            petBreed = "Dog";
         }
+        newPet.setBreed(petBreed);
         newPet.setBirthday(petBirthday);
 
         return newPet;

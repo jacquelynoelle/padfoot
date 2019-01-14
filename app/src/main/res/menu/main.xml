@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/menu_ble"
-        android:title="@string/menu_ble"
+    <item android:id="@+id/menu_connect"
+        android:title="@string/menu_connect"
         android:checkable="false"
-        android:orderInCategory="1"
-        android:showAsAction="ifRoom|withText"/>
+        android:orderInCategory="0" />
+    <item android:id="@+id/menu_disconnect"
+        android:title="@string/menu_disconnect"
+        android:checkable="false"
+        android:orderInCategory="0" />
     <item
-        android:id="@+id/sign_out_menu"
+        android:id="@+id/menu_edit_profile"
+        android:title="@string/menu_edit_profile" />
+    <item
+        android:id="@+id/menu_sign_out"
         android:title="@string/sign_out" />
-        <!--android:showAsAction="never"/>-->
 </menu>

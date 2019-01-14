@@ -1,5 +1,5 @@
 package io.github.jacquelynoelle.padfoot;
 
-public interface FirebaseCallback {
+public interface FirebaseStringCallback {
     void onCallback(String value);
 }

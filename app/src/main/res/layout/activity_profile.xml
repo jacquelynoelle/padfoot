@@ -18,17 +18,10 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/profile_setup"
-                android:textSize="24sp" />
-
             <!-- Pet name -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="16dp"
                 android:text="@string/profile_pet_name"
                 android:textAllCaps="true" />
 
@@ -37,13 +30,12 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/profile_pet_name_example"
                 android:id="@+id/et_name"
-                android:paddingTop="16dp" />
+                android:layout_marginBottom="16dp" />
 
             <!-- Size -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="16dp"
                 android:text="@string/profile_size"
                 android:textAllCaps="true" />
 
@@ -52,7 +44,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/select"
-                android:paddingTop="16dp"
+                android:paddingTop="8dp"
+                android:layout_marginBottom="16dp"
                 android:prompt="@string/select"
                 android:spinnerMode="dropdown" />
 
@@ -60,7 +53,6 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="16dp"
                 android:text="@string/profile_breed"
                 android:textAllCaps="true" />
 
@@ -70,13 +62,12 @@
                 android:layout_height="wrap_content"
                 android:completionThreshold="1"
                 android:hint="@string/profile_breed_example"
-                android:paddingTop="16dp" />
+                android:layout_marginBottom="16dp" />
 
             <!-- Birthday -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="16dp"
                 android:text="@string/profile_birthday"
                 android:textAllCaps="true" />
 
@@ -87,15 +78,18 @@
                 android:calendarViewShown="false"
                 android:datePickerMode="spinner"
                 android:endYear="@string/current_year"
-                android:paddingTop="16dp"
+                android:layout_marginBottom="16dp"
                 android:startYear="2000" />
 
             <Button
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/b_profile_submit"
                 android:text="@string/submit"
-                android:gravity="center_horizontal"/>
+                android:gravity="center"
+                android:background="@color/colorAccent"
+                android:textColor="@color/colorWhite"
+                android:layout_marginBottom="16dp" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
