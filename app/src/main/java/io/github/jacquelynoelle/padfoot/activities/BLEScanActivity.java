@@ -79,32 +79,27 @@ public class BLEScanActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.ble, menu);
-//        if (!mScanning) {
-            menu.findItem(R.id.menu_refresh).setActionView(
-                    R.layout.actionbar_indeterminate_progress);
-            menu.findItem(R.id.menu_stop).setVisible(false);
-//        } else {
-//            menu.findItem(R.id.menu_refresh).setVisible(false);
-//            menu.findItem(R.id.menu_stop).setVisible(true);
-//        }
+        menu.findItem(R.id.menu_refresh).setVisible(true);
+        menu.findItem(R.id.menu_stop).setVisible(true);
+        menu.findItem(R.id.menu_home).setVisible(true);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+//        TODO add scan in progress wheel?
         switch (item.getItemId()) {
             case R.id.menu_refresh:
-                mAdapter.clear();
+                mAdapter = new BLEDeviceAdapter(this);
+                mDeviceList.setAdapter(mAdapter);
                 scanLeDevice(true);
                 break;
             case R.id.menu_stop:
                 scanLeDevice(false);
                 break;
-//            case R.id.action_refresh:
-//                // COMPLETED (14) Pass in this as the ListItemClickListener to the BLEDeviceAdapter constructor
-//                mAdapter = new BLEDeviceAdapter(NUM_LIST_ITEMS, this);
-//                mDeviceList.setAdapter(mAdapter);
-//                return true;
+            case R.id.menu_home:
+                Intent homeIntent = new Intent(this, MainActivity.class);
+                startActivity(homeIntent);
         }
 
         return super.onOptionsItemSelected(item);

@@ -13,6 +13,7 @@
     <string name="unknown_service">Unknown service</string>
 
     <!-- Menu items -->
+    <string name="menu_home">Home</string>
     <string name="menu_edit_profile">Edit profile</string>
     <string name="menu_connect">Connect tracker</string>
     <string name="menu_disconnect">Disconnect tracker</string>
@@ -57,6 +58,6 @@
     <string name="current_year">2019</string>
 
     <!-- Main Activity strings -->
-    <string name="step_count_header">Today\'s step count:</string>
-    <string name="step_count_placeholder">No steps yet!</string>
+    <string name="step_count_header">Today\'s step count</string>
+    <string name="step_count_placeholder">--</string>
 </resources>

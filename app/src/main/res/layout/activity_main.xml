@@ -1,29 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<HorizontalScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:layout_gravity="center" >
+    android:background="@color/colorPrimaryLight" >
 
-    <TextView
-        android:id="@+id/tv_step_count_header"
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/step_count_header"
-        android:textSize="24sp"
-        android:gravity="center"
-        />
+        android:padding="16dp">
 
-    <TextView
-        android:id="@+id/tv_step_count"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/step_count_placeholder"
-        android:textSize="48sp"
-        android:textColor="@color/colorPrimary"
-        android:gravity="center"
-        />
+        <android.support.v7.widget.CardView
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/card_view"
+            android:layout_width="280dp"
+            android:layout_height="280dp"
+            android:layout_margin="16dp"
+            card_view:cardCornerRadius="8dp" >
 
-</LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_step_count_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/step_count_header"
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    android:textAllCaps="true"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_step_count"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/step_count_placeholder"
+                    android:textSize="48sp"
+                    android:textColor="@color/colorPrimary"
+                    android:gravity="center"
+                    />
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/card_view2"
+            android:layout_width="280dp"
+            android:layout_height="280dp"
+            android:layout_margin="16dp"
+            card_view:cardCornerRadius="8dp" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_step_count_header2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="YESTERDAY'S STEP COUNT"
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    android:textAllCaps="true"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_step_count2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/step_count_placeholder"
+                    android:textSize="48sp"
+                    android:textColor="@color/colorPrimary"
+                    android:gravity="center"
+                    />
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+    </LinearLayout>
+</HorizontalScrollView>

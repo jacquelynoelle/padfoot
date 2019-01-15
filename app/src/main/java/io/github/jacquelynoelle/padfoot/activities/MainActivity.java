@@ -64,10 +64,10 @@ public class MainActivity extends AppCompatActivity {
                 final Intent bleConnectIntent = new Intent(this, BLEScanActivity.class);
                 startActivity(bleConnectIntent);
                 break;
-            case R.id.menu_disconnect:
-                final Intent bleDisconnectIntent = new Intent(this, BLEScanActivity.class);
-                startActivity(bleDisconnectIntent);
-                break;
+//            case R.id.menu_disconnect:
+//                final Intent bleDisconnectIntent = new Intent(this, BLEScanActivity.class);
+//                startActivity(bleDisconnectIntent);
+//                break;
             case R.id.menu_edit_profile:
                 final Intent editProfileIntent = new Intent(this, EditProfileActivity.class);
                 editProfileIntent.putExtra("petID", getIntent().getStringExtra("petID"));
