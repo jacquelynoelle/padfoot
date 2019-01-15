@@ -1,4 +1,4 @@
-package io.github.jacquelynoelle.padfoot.bluetoothle;
+package io.github.jacquelynoelle.padfoot.activities;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -19,8 +19,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import io.github.jacquelynoelle.padfoot.activities.MainActivity;
 import io.github.jacquelynoelle.padfoot.R;
+import io.github.jacquelynoelle.padfoot.bluetoothle.BLEDeviceAdapter;
+import io.github.jacquelynoelle.padfoot.bluetoothle.BLEService;
 
 public class BLEScanActivity extends AppCompatActivity
         implements BLEDeviceAdapter.ListItemClickListener {
@@ -42,6 +43,7 @@ public class BLEScanActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_blescan);
+        getSupportActionBar().setTitle(getString(R.string.connect_tracker));
 
         mHandler = new Handler();
         mDeviceList = (RecyclerView) findViewById(R.id.rv_devices);
@@ -77,23 +79,21 @@ public class BLEScanActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.ble, menu);
-        if (!mScanning) {
-            menu.findItem(R.id.menu_stop).setVisible(false);
-            menu.findItem(R.id.menu_scan).setVisible(true);
-            menu.findItem(R.id.menu_refresh).setActionView(null);
-        } else {
-            menu.findItem(R.id.menu_stop).setVisible(true);
-            menu.findItem(R.id.menu_scan).setVisible(false);
+//        if (!mScanning) {
             menu.findItem(R.id.menu_refresh).setActionView(
                     R.layout.actionbar_indeterminate_progress);
-        }
+            menu.findItem(R.id.menu_stop).setVisible(false);
+//        } else {
+//            menu.findItem(R.id.menu_refresh).setVisible(false);
+//            menu.findItem(R.id.menu_stop).setVisible(true);
+//        }
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_scan:
+            case R.id.menu_refresh:
                 mAdapter.clear();
                 scanLeDevice(true);
                 break;

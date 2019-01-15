@@ -3,13 +3,9 @@
 
     <!-- BLE strings -->
     <string name="ble_not_supported">BLE is not supported</string>
-    <string name="label_data">Data:</string>
-    <string name="label_device_address">Device address:</string>
-    <string name="label_state">State:</string>
-    <string name="no_data">No data</string>
     <string name="connected">Connected</string>
     <string name="disconnected">Disconnected</string>
-    <string name="title_devices">BLE Device Scan</string>
+    <string name="connect_tracker">Connect a tracker</string>
     <string name="error_bluetooth_not_supported">Bluetooth not supported.</string>
 
     <string name="unknown_device">Unknown device</string>
@@ -20,8 +16,8 @@
     <string name="menu_edit_profile">Edit profile</string>
     <string name="menu_connect">Connect tracker</string>
     <string name="menu_disconnect">Disconnect tracker</string>
-    <string name="menu_scan">Scan</string>
-    <string name="menu_stop">Stop</string>
+    <string name="menu_refresh">Refresh</string>
+    <string name="menu_stop">Stop scan</string>
     <string name="title_activity_login">Sign in</string>
     <string name="sign_out">Sign out</string>
 
@@ -39,6 +35,7 @@
     </string>
 
     <!-- Profile strings -->
+    <string name="profile">Profile</string>
     <string name="profile_setup">Create your pet\'s profile</string>
     <string name="profile_pet_name">Pet name</string>
     <string name="profile_pet_name_example">Fido</string>

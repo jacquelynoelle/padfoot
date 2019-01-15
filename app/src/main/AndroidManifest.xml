@@ -36,7 +36,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".bluetoothle.BLEScanActivity" />
+        <activity android:name=".activities.BLEScanActivity" />
         <activity android:name=".activities.EditProfileActivity"></activity>
     </application>
 

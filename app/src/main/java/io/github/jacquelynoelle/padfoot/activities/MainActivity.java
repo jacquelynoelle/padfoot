@@ -24,7 +24,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.firebase.ui.auth.AuthUI;
 
 import io.github.jacquelynoelle.padfoot.R;
-import io.github.jacquelynoelle.padfoot.bluetoothle.BLEScanActivity;
 import io.github.jacquelynoelle.padfoot.bluetoothle.BLEService;
 
 public class MainActivity extends AppCompatActivity {

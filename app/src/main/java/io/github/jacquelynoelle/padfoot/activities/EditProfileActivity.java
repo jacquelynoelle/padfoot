@@ -28,7 +28,6 @@ import java.util.Date;
 import java.util.HashMap;
 
 import io.github.jacquelynoelle.padfoot.R;
-import io.github.jacquelynoelle.padfoot.bluetoothle.BLEScanActivity;
 import io.github.jacquelynoelle.padfoot.models.Pet;
 import io.github.jacquelynoelle.padfoot.models.PetSize;
 
@@ -53,7 +52,7 @@ public class EditProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().setTitle(getString(R.string.profile_setup));
+        getSupportActionBar().setTitle(getString(R.string.profile));
         setContentView(R.layout.activity_profile);
 
         database = FirebaseDatabase.getInstance();
