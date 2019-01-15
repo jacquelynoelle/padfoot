@@ -1,4 +1,4 @@
-package io.github.jacquelynoelle.padfoot;
+package io.github.jacquelynoelle.padfoot.bluetoothle;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -18,6 +18,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import io.github.jacquelynoelle.padfoot.MainActivity;
+import io.github.jacquelynoelle.padfoot.R;
 
 public class BLEScanActivity extends AppCompatActivity
         implements BLEDeviceAdapter.ListItemClickListener {
@@ -145,7 +148,7 @@ public class BLEScanActivity extends AppCompatActivity
 
     /**
      * This is where we receive our callback from
-     * {@link io.github.jacquelynoelle.padfoot.BLEDeviceAdapter.ListItemClickListener}
+     * {@link BLEDeviceAdapter.ListItemClickListener}
      *
      * This callback is invoked when you click on an item in the list.
      *

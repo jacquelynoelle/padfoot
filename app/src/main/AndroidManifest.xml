@@ -25,7 +25,7 @@
         <activity android:name=".MainActivity" />
 
         <service
-            android:name=".BLEService"
+            android:name=".bluetoothle.BLEService"
             android:enabled="true" />
 
         <activity android:name=".ProfileActivity" />
@@ -36,7 +36,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".BLEScanActivity" />
+        <activity android:name=".bluetoothle.BLEScanActivity" />
         <activity android:name=".EditProfileActivity"></activity>
     </application>
 

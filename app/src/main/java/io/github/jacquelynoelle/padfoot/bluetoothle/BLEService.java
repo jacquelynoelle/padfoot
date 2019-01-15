@@ -1,4 +1,4 @@
-package io.github.jacquelynoelle.padfoot;
+package io.github.jacquelynoelle.padfoot.bluetoothle;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -20,6 +20,8 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.List;
 import java.util.UUID;
+
+import io.github.jacquelynoelle.padfoot.SampleGattAttributes;
 
 public class BLEService extends Service {
 

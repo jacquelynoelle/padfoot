@@ -27,6 +27,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
+import io.github.jacquelynoelle.padfoot.bluetoothle.BLEScanActivity;
+
 public class EditProfileActivity extends AppCompatActivity {
 
     private final static String TAG = EditProfileActivity.class.getSimpleName();
