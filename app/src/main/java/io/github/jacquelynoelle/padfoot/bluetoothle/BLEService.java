@@ -21,8 +21,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.List;
 import java.util.UUID;
 
-import io.github.jacquelynoelle.padfoot.SampleGattAttributes;
-
 public class BLEService extends Service {
 
     private final static String TAG = BLEService.class.getSimpleName();
@@ -198,9 +196,9 @@ public class BLEService extends Service {
         mBluetoothGatt.setCharacteristicNotification(characteristic, enabled);
 
         // This is specific to Step Count
-        if (SampleGattAttributes.STEP_COUNT.equals(characteristic.getUuid())) {
+        if (BLEGattAttributes.STEP_COUNT.equals(characteristic.getUuid())) {
             BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
-                    UUID.fromString(SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG));
+                    UUID.fromString(BLEGattAttributes.CLIENT_CHARACTERISTIC_CONFIG));
             descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
             mBluetoothGatt.writeDescriptor(descriptor);
         }
@@ -259,8 +257,8 @@ public class BLEService extends Service {
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
                 // set characterisitic notification
 
-                final BluetoothGattService rscService = gatt.getService(UUID.fromString(SampleGattAttributes.RUNNING_SPEED_AND_CADENCE));
-                final BluetoothGattCharacteristic characteristic = rscService.getCharacteristic(UUID.fromString(SampleGattAttributes.STEP_COUNT));
+                final BluetoothGattService rscService = gatt.getService(UUID.fromString(BLEGattAttributes.RUNNING_SPEED_AND_CADENCE));
+                final BluetoothGattCharacteristic characteristic = rscService.getCharacteristic(UUID.fromString(BLEGattAttributes.STEP_COUNT));
 
                 if (rscService == null || characteristic == null) {
                     Log.i(TAG, "Incompatible device.");
@@ -318,7 +316,7 @@ public class BLEService extends Service {
         database = FirebaseDatabase.getInstance().getReference();
 
         // Special handling for Step Count characteristic
-        if (SampleGattAttributes.STEP_COUNT.equals(characteristic.getUuid().toString())) {
+        if (BLEGattAttributes.STEP_COUNT.equals(characteristic.getUuid().toString())) {
 //            TODO: Not sure why it was coming through as an 8-bit integer instead of 16
 //                TODO: Likely need to figure out sending through array to use timestamps
 //            int flag = characteristic.getProperties();

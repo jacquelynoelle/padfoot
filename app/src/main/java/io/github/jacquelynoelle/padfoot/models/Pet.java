@@ -1,10 +1,10 @@
-package io.github.jacquelynoelle.padfoot;
+package io.github.jacquelynoelle.padfoot.models;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
+
+import io.github.jacquelynoelle.padfoot.models.Challenge;
 
 @IgnoreExtraProperties
 public class Pet {

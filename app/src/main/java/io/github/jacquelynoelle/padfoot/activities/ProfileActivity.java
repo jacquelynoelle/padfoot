@@ -1,4 +1,4 @@
-package io.github.jacquelynoelle.padfoot;
+package io.github.jacquelynoelle.padfoot.activities;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -17,8 +17,9 @@ import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.Calendar;
-import java.util.Date;
+import io.github.jacquelynoelle.padfoot.R;
+import io.github.jacquelynoelle.padfoot.models.Pet;
+import io.github.jacquelynoelle.padfoot.models.PetSize;
 
 public class ProfileActivity extends AppCompatActivity {
 

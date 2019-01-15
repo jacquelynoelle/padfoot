@@ -22,14 +22,14 @@
         android:roundIcon="@mipmap/padfoot_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity" />
+        <activity android:name=".activities.MainActivity" />
 
         <service
             android:name=".bluetoothle.BLEService"
             android:enabled="true" />
 
-        <activity android:name=".ProfileActivity" />
-        <activity android:name=".SplashActivity">
+        <activity android:name=".activities.ProfileActivity" />
+        <activity android:name=".activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -37,7 +37,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".bluetoothle.BLEScanActivity" />
-        <activity android:name=".EditProfileActivity"></activity>
+        <activity android:name=".activities.EditProfileActivity"></activity>
     </application>
 
 </manifest>

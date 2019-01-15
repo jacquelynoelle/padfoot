@@ -1,4 +1,4 @@
-package io.github.jacquelynoelle.padfoot;
+package io.github.jacquelynoelle.padfoot.activities;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -27,7 +27,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
+import io.github.jacquelynoelle.padfoot.R;
 import io.github.jacquelynoelle.padfoot.bluetoothle.BLEScanActivity;
+import io.github.jacquelynoelle.padfoot.models.Pet;
+import io.github.jacquelynoelle.padfoot.models.PetSize;
 
 public class EditProfileActivity extends AppCompatActivity {
 

@@ -1,7 +1,6 @@
-package io.github.jacquelynoelle.padfoot;
+package io.github.jacquelynoelle.padfoot.activities;
 
 import android.content.Intent;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,6 +18,11 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.Arrays;
 import java.util.List;
+
+import io.github.jacquelynoelle.padfoot.BuildConfig;
+import io.github.jacquelynoelle.padfoot.FirebaseStringCallback;
+import io.github.jacquelynoelle.padfoot.R;
+import io.github.jacquelynoelle.padfoot.models.User;
 
 public class SplashActivity extends AppCompatActivity {
 

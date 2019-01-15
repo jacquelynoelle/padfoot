@@ -19,7 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import io.github.jacquelynoelle.padfoot.MainActivity;
+import io.github.jacquelynoelle.padfoot.activities.MainActivity;
 import io.github.jacquelynoelle.padfoot.R;
 
 public class BLEScanActivity extends AppCompatActivity

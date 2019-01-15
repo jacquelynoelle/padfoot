@@ -1,4 +1,4 @@
-package io.github.jacquelynoelle.padfoot;
+package io.github.jacquelynoelle.padfoot.activities;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -23,6 +23,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import com.firebase.ui.auth.AuthUI;
 
+import io.github.jacquelynoelle.padfoot.R;
 import io.github.jacquelynoelle.padfoot.bluetoothle.BLEScanActivity;
 import io.github.jacquelynoelle.padfoot.bluetoothle.BLEService;
 

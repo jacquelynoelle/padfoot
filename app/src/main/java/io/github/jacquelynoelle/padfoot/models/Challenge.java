@@ -1,8 +1,7 @@
-package io.github.jacquelynoelle.padfoot;
+package io.github.jacquelynoelle.padfoot.models;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.Date;
-import java.util.ArrayList;
 import java.util.Calendar;
 
 @IgnoreExtraProperties

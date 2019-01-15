@@ -1,4 +1,4 @@
-package io.github.jacquelynoelle.padfoot;
+package io.github.jacquelynoelle.padfoot.models;
 
 public enum PetSize {
     TOY("Toy"),
