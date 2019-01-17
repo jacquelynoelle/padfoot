@@ -158,6 +158,11 @@ public class MainActivity extends AppCompatActivity {
                        "Data streaming",
                         Toast.LENGTH_SHORT);
                 toast.show();
+            } else if (BLEService.DESCRIPTOR_WRITTEN.equals(action)) {
+                Toast toast = Toast.makeText(getApplicationContext(),
+                       "Descriptor written",
+                        Toast.LENGTH_SHORT);
+                toast.show();
             }
         }
     };
@@ -168,6 +173,7 @@ public class MainActivity extends AppCompatActivity {
         intentFilter.addAction(BLEService.ACTION_GATT_DISCONNECTED);
         intentFilter.addAction(BLEService.ACTION_GATT_SERVICES_DISCOVERED);
         intentFilter.addAction(BLEService.ACTION_DATA_AVAILABLE);
+        intentFilter.addAction(BLEService.DESCRIPTOR_WRITTEN);
         return intentFilter;
     }
 }

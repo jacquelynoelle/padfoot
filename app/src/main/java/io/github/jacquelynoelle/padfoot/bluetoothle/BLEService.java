@@ -47,10 +47,18 @@ public class BLEService extends Service {
             "com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERED";
     public final static String ACTION_DATA_AVAILABLE =
             "com.example.bluetooth.le.ACTION_DATA_AVAILABLE";
+    public final static String DESCRIPTOR_WRITTEN =
+            "com.example.bluetooth.le.DESCRIPTOR_WRITTEN";
     public final static String EXTRA_DATA =
             "com.example.bluetooth.le.EXTRA_DATA";
     public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
     public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
+
+
+    interface DescriptorCallback {
+        // this can be any type of method
+        void onCallback();
+    }
 
     @Override
     public int onStartCommand (Intent intent, int flags, int startId) {
@@ -182,29 +190,6 @@ public class BLEService extends Service {
     }
 
     /**
-     * Enables or disables notification on a give characteristic.
-     *
-     * @param characteristic Characteristic to act on.
-     * @param enabled If true, enable notification.  False otherwise.
-     */
-    public void setCharacteristicNotification(BluetoothGattCharacteristic characteristic,
-                                              boolean enabled) {
-        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-            Log.w(TAG, "BluetoothAdapter not initialized");
-            return;
-        }
-        mBluetoothGatt.setCharacteristicNotification(characteristic, enabled);
-
-        // This is specific to Step Count
-        if (BLEGattAttributes.STEP_COUNT.equals(characteristic.getUuid())) {
-            BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
-                    UUID.fromString(BLEGattAttributes.CLIENT_CHARACTERISTIC_CONFIG));
-            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-            mBluetoothGatt.writeDescriptor(descriptor);
-        }
-    }
-
-    /**
      * Retrieves a list of supported GATT services on the connected device. This should be
      * invoked only after {@code BluetoothGatt#discoverServices()} completes successfully.
      *
@@ -231,6 +216,48 @@ public class BLEService extends Service {
     // Implements callback methods for GATT events that the app cares about.  For example,
     // connection change and services discovered.
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
+        List<BluetoothGattCharacteristic> characteristics;
+
+        /**
+         * Enables or disables notification on a give characteristic.
+         *
+//         * @param characteristics Characteristics to act on.
+//         * @param enabled If true, enable notification.  False otherwise.
+         */
+        public void setCharacteristicsNotification() {
+            if(characteristics.size() == 0) return;
+
+            BluetoothGattCharacteristic characteristic = characteristics.get(0);
+
+            final int charaProp = characteristic.getProperties();
+//        if ((charaProp | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
+//            // If there is an active notification on a characteristic, clear
+//            // it first so it doesn't update the data field on the user interface.
+//            if (mNotifyCharacteristic != null) {
+//                setCharacteristicNotification(
+//                        mNotifyCharacteristic, false);
+//                mNotifyCharacteristic = null;
+//            }
+//            readCharacteristic(characteristic);
+//        }
+            if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
+                mNotifyCharacteristic = characteristic;
+                if (mBluetoothAdapter == null || mBluetoothGatt == null) {
+                    Log.w(TAG, "BluetoothAdapter not initialized");
+                    return;
+                }
+
+                mBluetoothGatt.setCharacteristicNotification(characteristic, true);
+
+                BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
+                        UUID.fromString(BLEGattAttributes.CLIENT_CHARACTERISTIC_CONFIG));
+                descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                characteristic.setWriteType(2);
+                boolean success = mBluetoothGatt.writeDescriptor(descriptor);
+                // test
+            }
+        }
+
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             String intentAction;
@@ -258,31 +285,23 @@ public class BLEService extends Service {
                 // set characterisitic notification
 
                 final BluetoothGattService rscService = gatt.getService(UUID.fromString(BLEGattAttributes.RUNNING_SPEED_AND_CADENCE));
-                final BluetoothGattCharacteristic characteristic = rscService.getCharacteristic(UUID.fromString(BLEGattAttributes.STEP_COUNT));
+//                final BluetoothGattCharacteristic step_count = rscService.getCharacteristic(UUID.fromString(BLEGattAttributes.STEP_COUNT));
 
-                if (rscService == null || characteristic == null) {
-                    Log.i(TAG, "Incompatible device.");
-                }
+                characteristics = rscService.getCharacteristics();
 
-                final int charaProp = characteristic.getProperties();
-                if ((charaProp | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
-                    // If there is an active notification on a characteristic, clear
-                    // it first so it doesn't update the data field on the user interface.
-                    if (mNotifyCharacteristic != null) {
-                        setCharacteristicNotification(
-                                mNotifyCharacteristic, false);
-                        mNotifyCharacteristic = null;
-                    }
-                    readCharacteristic(characteristic);
-                }
-                if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
-                    mNotifyCharacteristic = characteristic;
-                    setCharacteristicNotification(
-                            characteristic, true);
-                }
+                setCharacteristicsNotification();
             } else {
                 Log.w(TAG, "onServicesDiscovered received: " + status);
             }
+        }
+
+        @Override
+        public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+            super.onDescriptorWrite(gatt, descriptor, status);
+
+            readCharacteristic(characteristics.remove(0));
+            setCharacteristicsNotification();
+            broadcastUpdate(DESCRIPTOR_WRITTEN);
         }
 
         @Override
@@ -300,6 +319,29 @@ public class BLEService extends Service {
             broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
         }
     };
+
+//    private void prepareNotification(BluetoothGattService rscService, List<BluetoothGattCharacteristic> characteristics) {
+//        if (rscService == null || characteristics == null) {
+//            Log.i(TAG, "Incompatible device.");
+//        }
+//
+//        final int charaProp = characteristics.get(0).getProperties();
+////        if ((charaProp | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
+////            // If there is an active notification on a characteristic, clear
+////            // it first so it doesn't update the data field on the user interface.
+////            if (mNotifyCharacteristic != null) {
+////                setCharacteristicNotification(
+////                        mNotifyCharacteristic, false);
+////                mNotifyCharacteristic = null;
+////            }
+////            readCharacteristic(characteristic);
+////        }
+//        if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
+//            mNotifyCharacteristic = characteristic;
+//            setCharacteristicNotification(
+//                    characteristic, true);
+//        }
+//    }
 
     private void broadcastUpdate(final String action) {
         final Intent intent = new Intent(action);
@@ -334,7 +376,26 @@ public class BLEService extends Service {
             final int stepCount = characteristic.getIntValue(format, 0);
             Log.d(TAG, String.format("Received step count: %d", stepCount));
             intent.putExtra(EXTRA_DATA, String.valueOf(stepCount));
-            database.child("test-data").push().setValue(stepCount); // TODO update to specific pet
+            database.child("test-data0").push().setValue(stepCount); // TODO update to specific pet
+        } else if (BLEGattAttributes.STEP_COUNT1.equals(characteristic.getUuid().toString())) {
+//            TODO: Not sure why it was coming through as an 8-bit integer instead of 16
+//                TODO: Likely need to figure out sending through array to use timestamps
+//            int flag = characteristic.getProperties();
+//            int format;
+//            if ((flag & 0x01) != 0) {
+//                format = BluetoothGattCharacteristic.FORMAT_UINT16;
+//                Log.d(TAG, "Step count format UINT16.");
+//            } else {
+//                format = BluetoothGattCharacteristic.FORMAT_UINT8;
+//                Log.d(TAG, "Step count format UINT8.");
+//            }
+            int format = BluetoothGattCharacteristic.FORMAT_UINT16;
+
+
+            final int stepCount = characteristic.getIntValue(format, 0);
+            Log.d(TAG, String.format("Received step count: %d", stepCount));
+            intent.putExtra(EXTRA_DATA, String.valueOf(stepCount));
+            database.child("test-data1").push().setValue(stepCount); // TODO update to specific pet
         } else {
             // For all other profiles, writes the data formatted in HEX.
             final byte[] data = characteristic.getValue();
