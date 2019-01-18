@@ -133,7 +133,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 mStepCount = dataSnapshot.getValue(Integer.class);
-                displayText.setText(mStepCount.toString());
+                if (mStepCount != null) {
+                    displayText.setText(mStepCount);
+                } else {
+                    displayText.setText("0");
+                }
             }
 
             @Override
