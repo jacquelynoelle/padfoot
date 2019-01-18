@@ -336,7 +336,7 @@ public class BLEService extends Service {
 //                Log.d(TAG, "Step count format UINT8.");
 //            }
 
-            int hour = mRightNow.get(Calendar.HOUR_OF_DAY);
+            int hour = mRightNow.get(Calendar.HOUR_OF_DAY); // TODO this value is not resetting unless app is restarted.. cached?
             int min = mRightNow.get(Calendar.MINUTE);
             int sec = mRightNow.get(Calendar.SECOND);
 

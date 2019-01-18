@@ -123,14 +123,6 @@ public class ProfileActivity extends AppCompatActivity {
         newPet.setBreed(petBreed);
         newPet.setBirthday(petBirthday);
 
-        SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.app_file), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString("petName ", petName);
-        editor.putString("petSize", petSize);
-        editor.putString("petBreed", petBreed);
-        editor.putString("petBirthday", petBirthday);
-        editor.apply();
-
         return newPet;
     }
 
@@ -139,6 +131,15 @@ public class ProfileActivity extends AppCompatActivity {
         DatabaseReference petReference = petsReference.push();
         petID = petReference.getKey();
         petReference.setValue(newPet);
+
+        SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.app_file), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("petID", petID);
+        editor.putString("petName", newPet.getName());
+        editor.putString("petSize", newPet.getSize());
+        editor.putString("petBreed", newPet.getBreed());
+        editor.putString("petBirthday", newPet.getBirthday());
+        editor.apply();
 
         // update petID in user
         usersReference.child(newPet.getOwnerID()).child("petID").setValue(petID);

@@ -85,7 +85,7 @@ public class EditProfileActivity extends AppCompatActivity {
         updateButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Pet pet = createPet();
-                updatePetInFirebase(pet);
+                updatePetData(pet);
 
                 // send to main step count activity
                 Intent updateProfileIntent = new Intent();
@@ -231,18 +231,18 @@ public class EditProfileActivity extends AppCompatActivity {
         newPet.setBreed(petBreed);
         newPet.setBirthday(petBirthday);
 
-        SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.app_file), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString("petName ", petName);
-        editor.putString("petSize", petSize);
-        editor.putString("petBreed", petBreed);
-        editor.putString("petBirthday", petBirthday);
-        editor.apply();
-
         return newPet;
     }
 
-    private void updatePetInFirebase(Pet newPet) {
+    private void updatePetData(Pet newPet) {
+        SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.app_file), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("petName", newPet.getName());
+        editor.putString("petSize", newPet.getSize());
+        editor.putString("petBreed", newPet.getBreed());
+        editor.putString("petBirthday", newPet.getBirthday());
+        editor.apply();
+
         HashMap petMap = newPet.toMap();
         currentPetReference.updateChildren(petMap);
     }
