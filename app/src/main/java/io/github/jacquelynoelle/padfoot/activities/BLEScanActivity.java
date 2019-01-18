@@ -9,6 +9,7 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -159,9 +160,13 @@ public class BLEScanActivity extends AppCompatActivity
             mScanning = false;
         }
 
+        SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.app_file), Context.MODE_PRIVATE);
+        String petID = sharedPref.getString("petID", null);
+
         final Intent intent = new Intent(this, BLEService.class);
         intent.putExtra(EXTRAS_DEVICE_NAME, device.getName());
         intent.putExtra(EXTRAS_DEVICE_ADDRESS, device.getAddress());
+        intent.putExtra("petID", petID);
         startService(intent);
 
         final Intent returnToStepCount = new Intent(this, MainActivity.class);

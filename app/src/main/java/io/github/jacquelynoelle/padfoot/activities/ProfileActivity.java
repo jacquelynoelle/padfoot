@@ -1,6 +1,8 @@
 package io.github.jacquelynoelle.padfoot.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -48,9 +50,10 @@ public class ProfileActivity extends AppCompatActivity {
         breedACTextView = findViewById(R.id.ac_breed);
         birthdayPicker = findViewById(R.id.dp_birthday);
 
-        petSizeSpinner.setSelection(3); // default to Medium
         petSizeSpinner.setAdapter(new ArrayAdapter<PetSize>(this,
                 android.R.layout.simple_spinner_item, PetSize.values()));
+        petSizeSpinner.setSelection(2); // default to Medium
+
         breedACTextView.setAdapter(new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line,
                 getResources().getStringArray(R.array.breeds_array)));
@@ -65,7 +68,7 @@ public class ProfileActivity extends AppCompatActivity {
                 // send to main step count activity
                 Intent setupProfile = new Intent();
                 setupProfile.setClass(ProfileActivity.this, MainActivity.class);
-                setupProfile.putExtra("petID", petID);
+//                setupProfile.putExtra("petID", petID);
                 startActivity(setupProfile);
                 finish();
             }
@@ -95,7 +98,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private String getDateFromDatePicker(DatePicker datePicker){
         int day = datePicker.getDayOfMonth();
-        int month = datePicker.getMonth();
+        int month = datePicker.getMonth() + 1;
         int year =  datePicker.getYear();
 
         String date = year + "-" + month + "-" + day;
@@ -119,6 +122,14 @@ public class ProfileActivity extends AppCompatActivity {
         }
         newPet.setBreed(petBreed);
         newPet.setBirthday(petBirthday);
+
+        SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.app_file), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("petName ", petName);
+        editor.putString("petSize", petSize);
+        editor.putString("petBreed", petBreed);
+        editor.putString("petBirthday", petBirthday);
+        editor.apply();
 
         return newPet;
     }

@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,6 +23,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import com.firebase.ui.auth.AuthUI;
+import com.google.firebase.database.ValueEventListener;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import io.github.jacquelynoelle.padfoot.R;
 import io.github.jacquelynoelle.padfoot.bluetoothle.BLEService;
@@ -31,8 +36,9 @@ public class MainActivity extends AppCompatActivity {
     private final static String TAG = MainActivity.class.getSimpleName();
     private TextView displayText;
     private DatabaseReference database;
-    private ChildEventListener eventListener;
+    private ValueEventListener eventListener;
     private Integer mStepCount;
+    private String mPetID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +50,9 @@ public class MainActivity extends AppCompatActivity {
 
         displayText = findViewById(R.id.tv_step_count);
         database = FirebaseDatabase.getInstance().getReference();
-        // can do the reference separately to get focused parts
+
+        SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.app_file), Context.MODE_PRIVATE);
+        mPetID = sharedPref.getString("petID", "test");
     }
 
     @Override
@@ -70,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
 //                break;
             case R.id.menu_edit_profile:
                 final Intent editProfileIntent = new Intent(this, EditProfileActivity.class);
-                editProfileIntent.putExtra("petID", getIntent().getStringExtra("petID"));
+//                editProfileIntent.putExtra("petID", getIntent().getStringExtra("petID"));
                 startActivity(editProfileIntent);
                 break;
             case R.id.menu_sign_out:
@@ -105,20 +113,36 @@ public class MainActivity extends AppCompatActivity {
 
     private void attachDatabaseReadListener() {
         // eventListener for updates to database
-        eventListener = new ChildEventListener() {
+//        eventListener = new ChildEventListener() {
+//            @Override
+//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//                mStepCount = dataSnapshot.getValue(Integer.class);
+//                displayText.setText(mStepCount.toString());
+//            }
+//
+//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//                mStepCount = dataSnapshot.getValue(Integer.class);
+//                displayText.setText(mStepCount.toString());
+//            }
+//            public void onChildRemoved(DataSnapshot dataSnapshot) {}
+//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+//            public void onCancelled(DatabaseError databaseError) {}
+//        };
+
+        eventListener = new ValueEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                mStepCount = dataSnapshot.getValue(Integer.class); // not working when most recent data is not a Pet object
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                mStepCount = dataSnapshot.getValue(Integer.class);
                 displayText.setText(mStepCount.toString());
             }
 
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
-            public void onChildRemoved(DataSnapshot dataSnapshot) {}
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
-            public void onCancelled(DatabaseError databaseError) {}
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {}
         };
 
-        database.child("test-data").addChildEventListener(eventListener);
+        String today = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
+
+        database.child("pets").child(mPetID).child("dailySteps").child(today).addValueEventListener(eventListener);
     }
 
     private void detachDatabaseReadListener() {

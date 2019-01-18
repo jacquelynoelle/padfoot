@@ -18,6 +18,8 @@ import android.util.Log;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,7 +35,10 @@ public class BLEService extends Service {
 
     private String mDeviceName;
     private String mDeviceAddress;
+    private String mPetID;
     private BluetoothGattCharacteristic mNotifyCharacteristic;
+
+    Calendar mRightNow;
 
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
@@ -56,6 +61,7 @@ public class BLEService extends Service {
     public int onStartCommand (Intent intent, int flags, int startId) {
         mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
         mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
+        mPetID = intent.getStringExtra("petID");
 
         if (!initialize()) {
             Log.e(TAG, "Unable to initialize Bluetooth");
@@ -63,6 +69,8 @@ public class BLEService extends Service {
         // Automatically connects to the device upon successful start-up initialization.
         connect(mDeviceAddress);
         mBluetoothGatt.discoverServices();
+
+        mRightNow = Calendar.getInstance();
 
         super.onStartCommand(intent, flags, startId);
         return START_REDELIVER_INTENT;
@@ -318,7 +326,6 @@ public class BLEService extends Service {
         // Special handling for Step Count characteristic
         if (BLEGattAttributes.STEP_COUNT.equals(characteristic.getUuid().toString())) {
 //            TODO: Not sure why it was coming through as an 8-bit integer instead of 16
-//                TODO: Likely need to figure out sending through array to use timestamps
 //            int flag = characteristic.getProperties();
 //            int format;
 //            if ((flag & 0x01) != 0) {
@@ -328,13 +335,24 @@ public class BLEService extends Service {
 //                format = BluetoothGattCharacteristic.FORMAT_UINT8;
 //                Log.d(TAG, "Step count format UINT8.");
 //            }
-            int format = BluetoothGattCharacteristic.FORMAT_UINT16;
 
+            int hour = mRightNow.get(Calendar.HOUR_OF_DAY);
+            int min = mRightNow.get(Calendar.MINUTE);
+            int sec = mRightNow.get(Calendar.SECOND);
 
-            final int stepCount = characteristic.getIntValue(format, 0);
-            Log.d(TAG, String.format("Received step count: %d", stepCount));
-            intent.putExtra(EXTRA_DATA, String.valueOf(stepCount));
-            database.child("test-data").push().setValue(stepCount); // TODO update to specific pet
+            String currentHour = hour + ":00";
+            String today = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
+
+            final int stepCount = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0);
+//            Log.d(TAG, String.format("Received step count: %d", stepCount));
+//            intent.putExtra(EXTRA_DATA, String.valueOf(stepCount));
+
+            if (hour == 0 && min == 0 && sec < 5) {
+                database.child("pets").child(mPetID).child("hourlySteps").setValue(null);
+            } else {
+                database.child("pets").child(mPetID).child("hourlySteps").child(currentHour).setValue(stepCount);
+                database.child("pets").child(mPetID).child("dailySteps").child(today).setValue(stepCount);
+            }
         } else {
             // For all other profiles, writes the data formatted in HEX.
             final byte[] data = characteristic.getValue();

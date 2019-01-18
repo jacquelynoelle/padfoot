@@ -1,6 +1,8 @@
 package io.github.jacquelynoelle.padfoot.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -129,13 +131,26 @@ public class SplashActivity extends AppCompatActivity {
         if (currentUser.getPetID() != null) {
             Log.i(TAG, "routeUser: already setup pet profile");
             Intent signedInIntent = new Intent(SplashActivity.this, MainActivity.class);
-            signedInIntent.putExtra("userID", firebaseUser.getUid());
-            signedInIntent.putExtra("petID", currentUser.getPetID());
+//            signedInIntent.putExtra("userID", firebaseUser.getUid());
+//            signedInIntent.putExtra("petID", currentUser.getPetID());
+
+            SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.app_file), Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("userID", firebaseUser.getUid());
+            editor.putString("petID", currentUser.getPetID());
+            editor.apply();
+
             startActivity(signedInIntent);
         } else {
             Log.i(TAG, "routeUser: already setup pet profile");
             Intent loginNewUser = new Intent(SplashActivity.this, ProfileActivity.class);
-            loginNewUser.putExtra("userID", firebaseUser.getUid());
+//            loginNewUser.putExtra("userID", firebaseUser.getUid());
+
+            SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("userID", firebaseUser.getUid());
+            editor.apply();
+
             startActivity(loginNewUser);
         }
         Log.i(TAG, "routeUser: finish");

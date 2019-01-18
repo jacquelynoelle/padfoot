@@ -1,6 +1,8 @@
 package io.github.jacquelynoelle.padfoot.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,6 +27,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 import io.github.jacquelynoelle.padfoot.R;
@@ -43,7 +46,7 @@ public class EditProfileActivity extends AppCompatActivity {
     FirebaseDatabase database;
     DatabaseReference petsReference;
     DatabaseReference currentPetReference;
-    String petID;
+    String mPetID;
 
     public interface FirebasePetCallback {
         void onCallback(Pet pet);
@@ -57,17 +60,21 @@ public class EditProfileActivity extends AppCompatActivity {
 
         database = FirebaseDatabase.getInstance();
         petsReference = database.getReference("pets");
-        petID = getIntent().getStringExtra("petID");
-        currentPetReference = petsReference.child(petID);
+
+        SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.app_file), Context.MODE_PRIVATE);
+        mPetID = sharedPref.getString("petID", "test");
+        currentPetReference = petsReference.child(mPetID);
 
         nameEditText = findViewById(R.id.et_name);
         petSizeSpinner = findViewById(R.id.sp_pet_size);
         breedACTextView = findViewById(R.id.ac_breed);
         birthdayPicker = findViewById(R.id.dp_birthday);
 
-        petSizeSpinner.setSelection(3); // default to Medium
-        petSizeSpinner.setAdapter(new ArrayAdapter<PetSize>(this,
-                android.R.layout.simple_spinner_item, PetSize.values()));
+        final ArrayAdapter<PetSize> petSizeAdapter = new ArrayAdapter<PetSize>(this,
+                android.R.layout.simple_spinner_item, PetSize.values());
+        petSizeSpinner.setAdapter(petSizeAdapter);
+        petSizeSpinner.setSelection(petSizeAdapter.getPosition(PetSize.MEDIUM)); // default to Medium
+
         breedACTextView.setAdapter(new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line,
                 getResources().getStringArray(R.array.breeds_array)));
@@ -83,7 +90,7 @@ public class EditProfileActivity extends AppCompatActivity {
                 // send to main step count activity
                 Intent updateProfileIntent = new Intent();
                 updateProfileIntent.setClass(EditProfileActivity.this, MainActivity.class);
-                updateProfileIntent.putExtra("petID", petID);
+//                updateProfileIntent.putExtra("petID", mPetID);
                 startActivity(updateProfileIntent);
                 finish();
             }
@@ -95,67 +102,52 @@ public class EditProfileActivity extends AppCompatActivity {
                 nameEditText.setText(pet.getName());
                 breedACTextView.setText(pet.getBreed());
 
-                Date parsed;
-                Calendar birthday = new Calendar() {
-                    @Override
-                    protected void computeTime() {
-
-                    }
-
-                    @Override
-                    protected void computeFields() {
-
-                    }
-
-                    @Override
-                    public void add(int field, int amount) {
-
-                    }
-
-                    @Override
-                    public void roll(int field, boolean up) {
-
-                    }
-
-                    @Override
-                    public int getMinimum(int field) {
-                        return 0;
-                    }
-
-                    @Override
-                    public int getMaximum(int field) {
-                        return 0;
-                    }
-
-                    @Override
-                    public int getGreatestMinimum(int field) {
-                        return 0;
-                    }
-
-                    @Override
-                    public int getLeastMaximum(int field) {
-                        return 0;
-                    }
-                };
                 int year = 2019;
                 int month = 1;
                 int day = 1;
 
                 try {
-                    // TODO fix date gathering from calendar
+                    GregorianCalendar birthday = new GregorianCalendar();
+
                     SimpleDateFormat format =
-                            new SimpleDateFormat("yyyy-m-d");
-                    parsed = format.parse(pet.getBirthday());
+                            new SimpleDateFormat("yyyy-MM-dd");
+                    Date parsed = format.parse(pet.getBirthday());
                     birthday.setTime(parsed);
+
                     year = birthday.get(Calendar.YEAR);
                     month = birthday.get(Calendar.MONTH);
                     day = birthday.get(Calendar.DAY_OF_MONTH);
+
                 }
                 catch(ParseException pe) {
                     Log.e(TAG, "Parse exception on pet birthday");
                 }
 
                 birthdayPicker.updateDate(year, month, day);
+
+                PetSize size;
+
+                switch (pet.getSize()) {
+                    case "Toy":
+                        size = PetSize.TOY;
+                        break;
+                   case "Small":
+                        size = PetSize.SMALL;
+                        break;
+                   case "Medium":
+                        size = PetSize.MEDIUM;
+                        break;
+                   case "Large":
+                        size = PetSize.LARGE;
+                        break;
+                   case "Extra Large":
+                        size = PetSize.EXTRA_LARGE;
+                        break;
+                    default:
+                        size = PetSize.MEDIUM;
+                }
+
+                petSizeSpinner.setSelection(petSizeAdapter.getPosition(size)); // default to Medium
             }
         });
     }
@@ -214,7 +206,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private String getDateFromDatePicker(DatePicker datePicker){
         int day = datePicker.getDayOfMonth();
-        int month = datePicker.getMonth();
+        int month = datePicker.getMonth() + 1;
         int year =  datePicker.getYear();
 
         String date = year + "-" + month + "-" + day;
@@ -238,6 +230,14 @@ public class EditProfileActivity extends AppCompatActivity {
         }
         newPet.setBreed(petBreed);
         newPet.setBirthday(petBirthday);
+
+        SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.app_file), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("petName ", petName);
+        editor.putString("petSize", petSize);
+        editor.putString("petBreed", petBreed);
+        editor.putString("petBirthday", petBirthday);
+        editor.apply();
 
         return newPet;
     }
