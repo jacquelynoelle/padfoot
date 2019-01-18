@@ -60,5 +60,6 @@
 
     <!-- Main Activity strings -->
     <string name="step_count_header">Today\'s step count</string>
+    <string name="hourly_chart_header">Hourly Breakdown</string>
     <string name="step_count_placeholder">--</string>
 </resources>

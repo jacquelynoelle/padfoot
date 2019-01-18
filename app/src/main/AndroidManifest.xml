@@ -37,7 +37,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.BLEScanActivity" />
-        <activity android:name=".activities.EditProfileActivity"></activity>
+        <activity android:name=".activities.EditProfileActivity" />
+        <activity android:name=".activities.BarChartActivity"
+            android:exported="true"></activity>
     </application>
 
 </manifest>
