@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 mStepCount = dataSnapshot.getValue(Integer.class);
                 if (mStepCount != null) {
-                    displayText.setText(mStepCount);
+                    displayText.setText(Integer.toString(mStepCount));
                 } else {
                     displayText.setText("0");
                 }
