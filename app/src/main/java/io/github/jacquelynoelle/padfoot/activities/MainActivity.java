@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
@@ -44,27 +45,33 @@ import io.github.jacquelynoelle.padfoot.bluetoothle.BLEService;
 public class MainActivity extends AppCompatActivity {
 
     private final static String TAG = MainActivity.class.getSimpleName();
+
     private TextView displayText;
     private DatabaseReference database;
-    private ValueEventListener mStepCountListener;
-    private ChildEventListener mHourlyStepCountListener;
-    private ChildEventListener mWeeklyStepCountListener;
-    private ArrayList<BarEntry> mHourlyEntries;
-    private Integer mStepCount;
-    private HashMap<String, Integer> mHourlySteps;
-    private HashMap<String, Integer> mDailySteps;
     private String mPetID;
+
+    private Integer mStepCount;
+    private ValueEventListener mStepCountListener;
+
     private BarChart mHourlyChart;
+    private ArrayList<BarEntry> mHourlyEntries;
+    private HashMap<String, Integer> mHourlySteps;
+    private ChildEventListener mHourlyStepCountListener;
+
+    private BarChart mWeeklyChart;
+    private ArrayList<BarEntry> mWeeklyEntries;
+    private HashMap<String, Integer> mDailySteps;
+    private ChildEventListener mWeeklyStepCountListener;
+
     private Calendar mRightNow;
     private String mToday;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-//        setTheme(R.style.AppTheme);
+        Log.i(TAG, "onCreate");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Log.i(TAG, "onCreate");
 
         displayText = findViewById(R.id.tv_step_count);
         database = FirebaseDatabase.getInstance().getReference();
@@ -72,11 +79,15 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.app_file), Context.MODE_PRIVATE);
         mPetID = sharedPref.getString("petID", "test");
 
-        mHourlySteps = new HashMap<>();
-        mDailySteps = new HashMap<>();
-        mHourlyChart = (BarChart) findViewById(R.id.chart_hourly);
-        mRightNow = Calendar.getInstance();
+        mHourlyChart = findViewById(R.id.chart_hourly);
         mHourlyEntries = new ArrayList<>();
+        mHourlySteps = new HashMap<>();
+
+        mWeeklyChart = findViewById(R.id.chart_weekly);
+        mWeeklyEntries = new ArrayList<>();
+        mDailySteps = new HashMap<>();
+
+        mRightNow = Calendar.getInstance();
     }
 
     @Override
@@ -125,8 +136,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         mToday = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
+        mHourlyEntries.clear();
+        mWeeklyEntries.clear();
         attachStepCountListener();
         attachHourlyStepCountListener();
+        attachWeeklyStepCountListener();
         loadHourlyChart();
         loadWeeklyChart();
         super.onResume();
@@ -135,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         unregisterReceiver(mGattUpdateReceiver);
-        detachDatabaseReadListener();
+        detachDatabaseReadListeners();
         super.onPause();
     }
 
@@ -155,8 +169,6 @@ public class MainActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {}
         };
 
-        String today = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
-
         database.child("pets").child(mPetID).child("dailySteps").child(mToday).addValueEventListener(mStepCountListener);
     }
 
@@ -167,8 +179,16 @@ public class MainActivity extends AppCompatActivity {
                 int currentHourSteps = dataSnapshot.getValue(Integer.class) == null ? 0 : dataSnapshot.getValue(Integer.class);
 
                 mHourlyEntries.add(new BarEntry(mHourlyEntries.size(), currentHourSteps));
-//                mHourlyEntries.set(HOUROFADDEDCHILD, new BarEntry(HOUROFADDEDCHILD, currentHourSteps));
 
+                if (previousChildName == null) {
+                    mHourlyEntries.remove(0);
+                }
+
+                if (currentHourSteps > mHourlyChart.getAxisLeft().getAxisMaximum()) {
+                    mHourlyChart.getAxisLeft().setAxisMaximum(currentHourSteps + 100);
+                }
+
+                mHourlyChart.notifyDataSetChanged();
                 mHourlyChart.invalidate();
                 mHourlyChart.animateY(3000);
             }
@@ -177,9 +197,16 @@ public class MainActivity extends AppCompatActivity {
                 int currentHour = mRightNow.get(Calendar.HOUR_OF_DAY);
                 int currentHourSteps = dataSnapshot.getValue(Integer.class) == null ? 0 : dataSnapshot.getValue(Integer.class);
 
+                mHourlyChart.getAxisLeft().resetAxisMaximum();
                 mHourlyEntries.set(currentHour, new BarEntry(currentHour, currentHourSteps));
 
-//                mHourlyChart.invalidate();
+                if (currentHourSteps > mHourlyChart.getAxisLeft().getAxisMaximum()) {
+                    mHourlyChart.getAxisLeft().setAxisMaximum(currentHourSteps + 100);
+                }
+
+                mHourlyChart.notifyDataSetChanged();
+                // we don't invalidate here because the chart would be reloading too often
+                // chart will reload on resume because it will trigger new child added
             }
             public void onChildRemoved(DataSnapshot dataSnapshot) {}
             public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {}
@@ -189,7 +216,56 @@ public class MainActivity extends AppCompatActivity {
         database.child("pets").child(mPetID).child("hourlySteps").addChildEventListener(mHourlyStepCountListener);
     }
 
-    private void detachDatabaseReadListener() {
+    private void attachWeeklyStepCountListener() {
+        mWeeklyStepCountListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String previousChildName) {
+                int dailySteps = dataSnapshot.getValue(Integer.class) == null ? 0 : dataSnapshot.getValue(Integer.class);
+
+
+                if (previousChildName == null) {
+                    mWeeklyEntries.add(new BarEntry(0, dailySteps));
+                } else {
+                    mWeeklyEntries.add(new BarEntry(mWeeklyEntries.size(), dailySteps));
+                }
+
+                if (previousChildName == null || mWeeklyEntries.size() > 7) {
+                    mWeeklyEntries.remove(0);
+                }
+
+                if (dailySteps > mWeeklyChart.getAxisLeft().getAxisMaximum()) {
+                    mWeeklyChart.getAxisLeft().setAxisMaximum(dailySteps + 100);
+                }
+
+                mWeeklyChart.notifyDataSetChanged();
+                mWeeklyChart.invalidate();
+                mWeeklyChart.animateY(3000);
+            }
+
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, String previousChildName) {
+                final int TODAY = 6;
+                int currentDaySteps = dataSnapshot.getValue(Integer.class) == null ? 0 : dataSnapshot.getValue(Integer.class);
+
+                mWeeklyChart.getAxisLeft().resetAxisMaximum();
+                mWeeklyEntries.set(TODAY, new BarEntry(TODAY, currentDaySteps));
+
+                if (currentDaySteps > mWeeklyChart.getAxisLeft().getAxisMaximum()) {
+                    mWeeklyChart.getAxisLeft().setAxisMaximum(currentDaySteps + 100);
+                }
+
+                mWeeklyChart.notifyDataSetChanged();
+                // we don't invalidate here because the chart would be reloading too often
+                // chart will reload on resume because it will trigger new child added
+            }
+            public void onChildRemoved(DataSnapshot dataSnapshot) {}
+            public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {}
+            public void onCancelled(DatabaseError databaseError) {}
+        };
+
+        database.child("pets").child(mPetID).child("dailySteps").orderByKey().limitToLast(7).addChildEventListener(mWeeklyStepCountListener);
+    }
+
+    private void detachDatabaseReadListeners() {
         if (mStepCountListener != null) {
             database.removeEventListener(mStepCountListener);
             mStepCountListener = null;
@@ -197,6 +273,10 @@ public class MainActivity extends AppCompatActivity {
         if (mHourlyStepCountListener != null) {
             database.removeEventListener(mHourlyStepCountListener);
             mHourlyStepCountListener = null;
+        }
+        if (mWeeklyStepCountListener != null) {
+            database.removeEventListener(mWeeklyStepCountListener);
+            mWeeklyStepCountListener = null;
         }
     }
 
@@ -213,17 +293,18 @@ public class MainActivity extends AppCompatActivity {
         XAxis xAxis = mHourlyChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(false);
-        xAxis.setAxisMinimum(-1);
+        xAxis.setAxisMinimum(-0.5f);
         xAxis.setAxisMaximum(24);
-        xAxis.setLabelCount(6);
 
         mHourlyChart.getAxisLeft().setEnabled(false);
         mHourlyChart.getAxisRight().setEnabled(false);
         mHourlyChart.getAxisLeft().setAxisMinimum(0f);
+        mHourlyChart.getAxisLeft().setAxisMaximum(1000f);
 
         mHourlyChart.getLegend().setEnabled(false);   // Hide the legend
 
-        mHourlyEntries.add(new BarEntry(0, 0));
+        mHourlyEntries.add(new BarEntry(0, 0)); // Add a single placeholder until data comes back from Firebase
+
         BarDataSet barDataSet = new BarDataSet(mHourlyEntries, "Cells");
         barDataSet.setHighlightEnabled(true);
         barDataSet.setDrawValues(false);
@@ -239,7 +320,6 @@ public class MainActivity extends AppCompatActivity {
         };
         barDataSet.setColors(ColorTemplate.createColors(getResources(), colors));
 
-
         Description description = new Description();
         description.setText("");
         mHourlyChart.setDescription(description); // set the description
@@ -248,64 +328,38 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void loadWeeklyChart() {
-        BarChart chart = (BarChart) findViewById(R.id.chart_weekly);
-        chart.setTouchEnabled(true);
-        chart.setDragEnabled(false);
-        chart.setScaleEnabled(false);
-        chart.setScaleXEnabled(false);
-        chart.setScaleYEnabled(false);
-        chart.setPinchZoom(false);
-        chart.setDoubleTapToZoomEnabled(false);
-        chart.setDragDecelerationEnabled(false);
+        mWeeklyChart.setTouchEnabled(true);
+        mWeeklyChart.setDragEnabled(false);
+        mWeeklyChart.setScaleEnabled(false);
+        mWeeklyChart.setScaleXEnabled(false);
+        mWeeklyChart.setScaleYEnabled(false);
+        mWeeklyChart.setPinchZoom(false);
+        mWeeklyChart.setDoubleTapToZoomEnabled(false);
+        mWeeklyChart.setDragDecelerationEnabled(false);
 
-        ArrayList<BarEntry> entries = new ArrayList<>();
-        entries.add(new BarEntry(0, 3));
-        entries.add(new BarEntry(1, 1));
-        entries.add(new BarEntry(2, 2));
-        entries.add(new BarEntry(3, 3));
-        entries.add(new BarEntry(4, 4));
-        entries.add(new BarEntry(5, 5));
-        entries.add(new BarEntry(6, 3));
+        XAxis xAxis = mWeeklyChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+        xAxis.setAxisMinimum(-0.5f);
+        xAxis.setAxisMaximum(6);
 
-        BarDataSet barDataSet = new BarDataSet(entries, "Cells");
+        mWeeklyChart.getAxisLeft().setEnabled(false);
+        mWeeklyChart.getAxisRight().setEnabled(false);
+        mWeeklyChart.getAxisLeft().setAxisMinimum(0f);
+        mHourlyChart.getAxisLeft().setAxisMaximum(1000f);
+
+        mWeeklyChart.getLegend().setEnabled(false);   // Hide the legend
+
+        mWeeklyEntries.add(new BarEntry(0, 0));
+
+        BarDataSet barDataSet = new BarDataSet(mWeeklyEntries, "Cells");
         barDataSet.setHighlightEnabled(true);
         barDataSet.setDrawValues(false);
         barDataSet.setHighLightColor(ContextCompat.getColor(this, R.color.colorPrimaryLight));
         barDataSet.setHighLightAlpha(255);
 
-        XAxis xAxis = chart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setDrawGridLines(false);
-        xAxis.setAxisMinimum(-0.5f);
-        xAxis.setLabelCount(6);
-
-        chart.getAxisLeft().setEnabled(false);
-        chart.getAxisRight().setEnabled(false);
-        chart.getAxisLeft().setAxisMinimum(0f);
-
-        chart.getLegend().setEnabled(false);   // Hide the legend
-
-        ArrayList<String> labels = new ArrayList<String>();
-        labels.add("Dec");
-        labels.add("Nov");
-        labels.add("Oct");
-        labels.add("Sep");
-        labels.add("Aug");
-        labels.add("Jul");
-        labels.add("Jun");
-        labels.add("May");
-        labels.add("Apr");
-        labels.add("Mar");
-        labels.add("Feb");
-        labels.add("Jan");
-
         BarData data = new BarData(barDataSet);
-        chart.setData(data); // set the data and list of lables into chart
-
-        Description description = new Description();
-        description.setText("");
-        chart.setDescription(description); // set the description
-        chart.setDrawBorders(false);
+        mWeeklyChart.setData(data); // set the data and list of lables into mWeeklyChart
 
         int[] colors = new int[]{
                 R.color.colorAccent,
@@ -313,8 +367,10 @@ public class MainActivity extends AppCompatActivity {
         };
         barDataSet.setColors(ColorTemplate.createColors(getResources(), colors));
 
-        chart.invalidate();
-        chart.animateY(3000);
+        Description description = new Description();
+        description.setText("");
+        mWeeklyChart.setDescription(description); // set the description
+        mWeeklyChart.setDrawBorders(false);
     }
 
     // Handles various events fired by the Service.
