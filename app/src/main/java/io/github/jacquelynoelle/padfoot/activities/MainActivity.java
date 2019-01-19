@@ -36,6 +36,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 
 import io.github.jacquelynoelle.padfoot.R;
 import io.github.jacquelynoelle.padfoot.bluetoothle.BLEService;
@@ -45,9 +46,17 @@ public class MainActivity extends AppCompatActivity {
     private final static String TAG = MainActivity.class.getSimpleName();
     private TextView displayText;
     private DatabaseReference database;
-    private ValueEventListener eventListener;
+    private ValueEventListener mStepCountListener;
+    private ChildEventListener mHourlyStepCountListener;
+    private ChildEventListener mWeeklyStepCountListener;
+    private ArrayList<BarEntry> mHourlyEntries;
     private Integer mStepCount;
+    private HashMap<String, Integer> mHourlySteps;
+    private HashMap<String, Integer> mDailySteps;
     private String mPetID;
+    private BarChart mHourlyChart;
+    private Calendar mRightNow;
+    private String mToday;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,13 +71,19 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.app_file), Context.MODE_PRIVATE);
         mPetID = sharedPref.getString("petID", "test");
+
+        mHourlySteps = new HashMap<>();
+        mDailySteps = new HashMap<>();
+        mHourlyChart = (BarChart) findViewById(R.id.chart_hourly);
+        mRightNow = Calendar.getInstance();
+        mHourlyEntries = new ArrayList<>();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         menu.findItem(R.id.menu_connect).setVisible(true);
-        menu.findItem(R.id.menu_disconnect).setVisible(true);
+//        menu.findItem(R.id.menu_disconnect).setVisible(true);
         menu.findItem(R.id.menu_edit_profile).setVisible(true);
         menu.findItem(R.id.menu_sign_out).setVisible(true);
         return true;
@@ -109,7 +124,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-        attachDatabaseReadListener();
+        mToday = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
+        attachStepCountListener();
+        attachHourlyStepCountListener();
         loadHourlyChart();
         loadWeeklyChart();
         super.onResume();
@@ -122,25 +139,8 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
-    private void attachDatabaseReadListener() {
-        // eventListener for updates to database
-//        eventListener = new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                mStepCount = dataSnapshot.getValue(Integer.class);
-//                displayText.setText(mStepCount.toString());
-//            }
-//
-//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//                mStepCount = dataSnapshot.getValue(Integer.class);
-//                displayText.setText(mStepCount.toString());
-//            }
-//            public void onChildRemoved(DataSnapshot dataSnapshot) {}
-//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
-//            public void onCancelled(DatabaseError databaseError) {}
-//        };
-
-        eventListener = new ValueEventListener() {
+    private void attachStepCountListener() {
+        mStepCountListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 mStepCount = dataSnapshot.getValue(Integer.class);
@@ -157,92 +157,81 @@ public class MainActivity extends AppCompatActivity {
 
         String today = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
 
-        database.child("pets").child(mPetID).child("dailySteps").child(today).addValueEventListener(eventListener);
+        database.child("pets").child(mPetID).child("dailySteps").child(mToday).addValueEventListener(mStepCountListener);
+    }
+
+    private void attachHourlyStepCountListener() {
+        mHourlyStepCountListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String previousChildName) {
+                int currentHourSteps = dataSnapshot.getValue(Integer.class) == null ? 0 : dataSnapshot.getValue(Integer.class);
+
+                mHourlyEntries.add(new BarEntry(mHourlyEntries.size(), currentHourSteps));
+//                mHourlyEntries.set(HOUROFADDEDCHILD, new BarEntry(HOUROFADDEDCHILD, currentHourSteps));
+
+                mHourlyChart.invalidate();
+                mHourlyChart.animateY(3000);
+            }
+
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, String previousChildName) {
+                int currentHour = mRightNow.get(Calendar.HOUR_OF_DAY);
+                int currentHourSteps = dataSnapshot.getValue(Integer.class) == null ? 0 : dataSnapshot.getValue(Integer.class);
+
+                mHourlyEntries.set(currentHour, new BarEntry(currentHour, currentHourSteps));
+
+//                mHourlyChart.invalidate();
+            }
+            public void onChildRemoved(DataSnapshot dataSnapshot) {}
+            public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {}
+            public void onCancelled(DatabaseError databaseError) {}
+        };
+
+        database.child("pets").child(mPetID).child("hourlySteps").addChildEventListener(mHourlyStepCountListener);
     }
 
     private void detachDatabaseReadListener() {
-        if (eventListener != null) {
-            database.removeEventListener(eventListener);
-            eventListener = null;
+        if (mStepCountListener != null) {
+            database.removeEventListener(mStepCountListener);
+            mStepCountListener = null;
+        }
+        if (mHourlyStepCountListener != null) {
+            database.removeEventListener(mHourlyStepCountListener);
+            mHourlyStepCountListener = null;
         }
     }
 
     private void loadHourlyChart() {
-        BarChart chart = (BarChart) findViewById(R.id.chart_hourly);
-        chart.setTouchEnabled(true);
-        chart.setDragEnabled(false);
-        chart.setScaleEnabled(false);
-        chart.setScaleXEnabled(false);
-        chart.setScaleYEnabled(false);
-        chart.setPinchZoom(false);
-        chart.setDoubleTapToZoomEnabled(false);
-        chart.setDragDecelerationEnabled(false);
+        mHourlyChart.setTouchEnabled(true);
+        mHourlyChart.setDragEnabled(false);
+        mHourlyChart.setScaleEnabled(false);
+        mHourlyChart.setScaleXEnabled(false);
+        mHourlyChart.setScaleYEnabled(false);
+        mHourlyChart.setPinchZoom(false);
+        mHourlyChart.setDoubleTapToZoomEnabled(false);
+        mHourlyChart.setDragDecelerationEnabled(false);
 
-        ArrayList<BarEntry> entries = new ArrayList<>();
-        entries.add(new BarEntry(0, 3));
-        entries.add(new BarEntry(1, 1));
-        entries.add(new BarEntry(2, 2));
-        entries.add(new BarEntry(3, 3));
-        entries.add(new BarEntry(4, 4));
-        entries.add(new BarEntry(5, 5));
-        entries.add(new BarEntry(6, 3));
-        entries.add(new BarEntry(7, 1));
-        entries.add(new BarEntry(8, 2));
-        entries.add(new BarEntry(9, 3));
-        entries.add(new BarEntry(10, 4));
-        entries.add(new BarEntry(11, 5));
-        entries.add(new BarEntry(12, 3));
-        entries.add(new BarEntry(13, 1));
-        entries.add(new BarEntry(14, 2));
-        entries.add(new BarEntry(15, 3));
-        entries.add(new BarEntry(16, 0));
-        entries.add(new BarEntry(17, 0));
-        entries.add(new BarEntry(18, 0));
-        entries.add(new BarEntry(19, 0));
-        entries.add(new BarEntry(20, 0));
-        entries.add(new BarEntry(21, 0));
-        entries.add(new BarEntry(22, 0));
-        entries.add(new BarEntry(23, 0));
+        XAxis xAxis = mHourlyChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+        xAxis.setAxisMinimum(-1);
+        xAxis.setAxisMaximum(24);
+        xAxis.setLabelCount(6);
 
-        BarDataSet barDataSet = new BarDataSet(entries, "Cells");
+        mHourlyChart.getAxisLeft().setEnabled(false);
+        mHourlyChart.getAxisRight().setEnabled(false);
+        mHourlyChart.getAxisLeft().setAxisMinimum(0f);
+
+        mHourlyChart.getLegend().setEnabled(false);   // Hide the legend
+
+        mHourlyEntries.add(new BarEntry(0, 0));
+        BarDataSet barDataSet = new BarDataSet(mHourlyEntries, "Cells");
         barDataSet.setHighlightEnabled(true);
         barDataSet.setDrawValues(false);
         barDataSet.setHighLightColor(ContextCompat.getColor(this, R.color.colorPrimaryLight));
         barDataSet.setHighLightAlpha(255);
 
-        XAxis xAxis = chart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setDrawGridLines(false);
-        xAxis.setAxisMinimum(-1);
-        xAxis.setLabelCount(6);
-
-        chart.getAxisLeft().setEnabled(false);
-        chart.getAxisRight().setEnabled(false);
-        chart.getAxisLeft().setAxisMinimum(0f);
-
-        chart.getLegend().setEnabled(false);   // Hide the legend
-
-        ArrayList<String> labels = new ArrayList<String>();
-        labels.add("Dec");
-        labels.add("Nov");
-        labels.add("Oct");
-        labels.add("Sep");
-        labels.add("Aug");
-        labels.add("Jul");
-        labels.add("Jun");
-        labels.add("May");
-        labels.add("Apr");
-        labels.add("Mar");
-        labels.add("Feb");
-        labels.add("Jan");
-
         BarData data = new BarData(barDataSet);
-        chart.setData(data); // set the data and list of lables into chart
-
-        Description description = new Description();
-        description.setText("");
-        chart.setDescription(description); // set the description
-        chart.setDrawBorders(false);
+        mHourlyChart.setData(data); // set the data and list of lables into chart
 
         int[] colors = new int[]{
                 R.color.colorAccent,
@@ -250,8 +239,11 @@ public class MainActivity extends AppCompatActivity {
         };
         barDataSet.setColors(ColorTemplate.createColors(getResources(), colors));
 
-        chart.invalidate();
-        chart.animateY(3000);
+
+        Description description = new Description();
+        description.setText("");
+        mHourlyChart.setDescription(description); // set the description
+        mHourlyChart.setDrawBorders(false);
     }
 
 
