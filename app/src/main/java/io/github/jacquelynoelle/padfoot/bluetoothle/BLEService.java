@@ -340,7 +340,7 @@ public class BLEService extends Service {
             int min = mRightNow.get(Calendar.MINUTE);
             int sec = mRightNow.get(Calendar.SECOND);
 
-            String currentHour = hour + ":00";
+            String currentHour = Integer.toString(hour);
             String today = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
 
             final int stepCount = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0);
