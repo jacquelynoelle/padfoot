@@ -38,8 +38,18 @@
         </activity>
         <activity android:name=".activities.BLEScanActivity" />
         <activity android:name=".activities.EditProfileActivity" />
-        <activity android:name=".activities.BarChartActivity"
-            android:exported="true"></activity>
+        <activity
+            android:name=".activities.BarChartActivity"
+            android:exported="true" />
+
+        <service
+            android:name=".DailyStepReset"
+            android:exported="false" />
+
+        <receiver
+            android:name=".AlarmReceiver"
+            android:enabled="true"
+            android:exported="true"></receiver>
     </application>
 
 </manifest>

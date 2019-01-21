@@ -348,7 +348,7 @@ public class BLEService extends Service {
 //            intent.putExtra(EXTRA_DATA, String.valueOf(stepCount));
 
             if (hour == 0 && min == 0 && sec < 5) {
-                database.child("pets").child(mPetID).child("hourlySteps").setValue(null);
+                database.child("pets").child(mPetID).child("hourlySteps").setValue(null); // TODO move to google cloud functions
             } else {
                 database.child("pets").child(mPetID).child("hourlySteps").child(currentHour).setValue(stepCount);
                 database.child("pets").child(mPetID).child("dailySteps").child(today).setValue(stepCount);

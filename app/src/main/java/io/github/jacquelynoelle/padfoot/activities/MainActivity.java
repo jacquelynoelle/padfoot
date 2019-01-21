@@ -1,5 +1,7 @@
 package io.github.jacquelynoelle.padfoot.activities;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -39,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
+import io.github.jacquelynoelle.padfoot.DailyStepReset;
 import io.github.jacquelynoelle.padfoot.R;
 import io.github.jacquelynoelle.padfoot.bluetoothle.BLEService;
 
@@ -65,6 +68,10 @@ public class MainActivity extends AppCompatActivity {
 
     private Calendar mRightNow;
     private String mToday;
+
+    private AlarmManager alarmMgr;
+    private PendingIntent alarmIntent;
+    public static final int REQUEST_CODE = 0; // for alarm
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+
         mToday = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
         mHourlyEntries.clear();
         mWeeklyEntries.clear();
@@ -143,6 +151,8 @@ public class MainActivity extends AppCompatActivity {
         attachWeeklyStepCountListener();
         loadHourlyChart();
         loadWeeklyChart();
+
+        startDailyStepCountRefresh();
         super.onResume();
     }
 
@@ -151,6 +161,25 @@ public class MainActivity extends AppCompatActivity {
         unregisterReceiver(mGattUpdateReceiver);
         detachDatabaseReadListeners();
         super.onPause();
+    }
+
+    private void startDailyStepCountRefresh() {
+        alarmMgr = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, DailyStepReset.class);
+        alarmIntent = PendingIntent.getService(this, 0, intent, 0);
+
+        // Set the alarm to start at midnight
+        Calendar alarmCalendar = Calendar.getInstance();
+        alarmCalendar.setTimeInMillis(System.currentTimeMillis());
+        alarmCalendar.set(Calendar.HOUR_OF_DAY, 23);
+        alarmCalendar.set(Calendar.MINUTE, 59);
+        alarmCalendar.set(Calendar.SECOND, 59);
+
+        int dailyInterval = 1000 * 60 * 60 * 24;
+
+        // setRepeating() interval on 24 hour cycle at midnight
+        alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, alarmCalendar.getTimeInMillis() + 1000,
+                dailyInterval, alarmIntent);
     }
 
     private void attachStepCountListener() {
