@@ -4,8 +4,8 @@
 
     <!-- BLE strings -->
     <string name="ble_not_supported">BLE is not supported</string>
-    <string name="connected">Connected</string>
-    <string name="disconnected">Disconnected</string>
+    <string name="connected">Tracker connected</string>
+    <string name="disconnected">Tracker disconnected</string>
     <string name="connect_tracker">Connect a tracker</string>
     <string name="error_bluetooth_not_supported">Bluetooth not supported.</string>
 

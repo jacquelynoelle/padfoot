@@ -3,6 +3,7 @@ package io.github.jacquelynoelle.padfoot.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +18,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -156,8 +159,9 @@ public class EditProfileActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         menu.findItem(R.id.menu_connect).setVisible(true);
-        menu.findItem(R.id.menu_disconnect).setVisible(true);
-        menu.findItem(R.id.menu_edit_profile).setVisible(true);
+        menu.findItem(R.id.menu_disconnect).setVisible(false);
+        menu.findItem(R.id.menu_edit_profile).setVisible(false);
+        menu.findItem(R.id.menu_home).setVisible(true);
         menu.findItem(R.id.menu_sign_out).setVisible(true);
         return true;
     }
@@ -175,12 +179,22 @@ public class EditProfileActivity extends AppCompatActivity {
 //                break;
             case R.id.menu_edit_profile:
                 final Intent editProfileIntent = new Intent(this, EditProfileActivity.class);
+//                editProfileIntent.putExtra("petID", getIntent().getStringExtra("petID"));
                 startActivity(editProfileIntent);
                 break;
+            case R.id.menu_home:
+                Intent homeIntent = new Intent(this, MainActivity.class);
+                startActivity(homeIntent);
+                break;
             case R.id.menu_sign_out:
-                AuthUI.getInstance().signOut(this);
-                Intent signOutIntent = new Intent(this, SplashActivity.class);
-                startActivity(signOutIntent);
+                AuthUI.getInstance()
+                        .signOut(this)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            public void onComplete(@NonNull Task<Void> task) {
+                                Intent signOutIntent = new Intent(EditProfileActivity.this, SplashActivity.class);
+                                startActivity(signOutIntent);
+                            }
+                        });
                 break;
             default:
                 return super.onOptionsItemSelected(item);

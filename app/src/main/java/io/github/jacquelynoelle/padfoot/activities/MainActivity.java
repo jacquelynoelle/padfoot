@@ -71,7 +71,9 @@ public class MainActivity extends AppCompatActivity {
 
     private AlarmManager alarmMgr;
     private PendingIntent alarmIntent;
-    public static final int REQUEST_CODE = 0; // for alarm
+    private static final int REQUEST_CODE = 0; // for alarm
+
+    private boolean mConnected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,8 +103,9 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         menu.findItem(R.id.menu_connect).setVisible(true);
-//        menu.findItem(R.id.menu_disconnect).setVisible(true);
+        menu.findItem(R.id.menu_disconnect).setVisible(true);
         menu.findItem(R.id.menu_edit_profile).setVisible(true);
+        menu.findItem(R.id.menu_home).setVisible(false);
         menu.findItem(R.id.menu_sign_out).setVisible(true);
         return true;
     }
@@ -114,14 +117,18 @@ public class MainActivity extends AppCompatActivity {
                 final Intent bleConnectIntent = new Intent(this, BLEScanActivity.class);
                 startActivity(bleConnectIntent);
                 break;
-//            case R.id.menu_disconnect:
-//                final Intent bleDisconnectIntent = new Intent(this, BLEScanActivity.class);
-//                startActivity(bleDisconnectIntent);
-//                break;
+            case R.id.menu_disconnect:
+                final Intent bleDisconnectIntent = new Intent(this, BLEService.class);
+                bleDisconnectIntent.setAction(BLEService.ACTION_GATT_DISCONNECT);
+                startService(bleDisconnectIntent);
+                break;
             case R.id.menu_edit_profile:
                 final Intent editProfileIntent = new Intent(this, EditProfileActivity.class);
-//                editProfileIntent.putExtra("petID", getIntent().getStringExtra("petID"));
                 startActivity(editProfileIntent);
+                break;
+            case R.id.menu_home:
+                Intent homeIntent = new Intent(this, MainActivity.class);
+                startActivity(homeIntent);
                 break;
             case R.id.menu_sign_out:
                 AuthUI.getInstance()
@@ -412,26 +419,22 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
-            if (BLEService.ACTION_GATT_CONNECTED.equals(action)) {
-                Toast toast = Toast.makeText(getApplicationContext(),
-                        R.string.connected,
-                        Toast.LENGTH_SHORT);
-                toast.show();
-            } else if (BLEService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                Toast toast = Toast.makeText(getApplicationContext(),
-                        R.string.disconnected,
-                        Toast.LENGTH_SHORT);
-                toast.show();
-            } else if (BLEService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                Toast toast = Toast.makeText(getApplicationContext(),
-                        "BLE service discovered",
-                        Toast.LENGTH_SHORT);
-                toast.show();
+            if (BLEService.ACTION_GATT_DISCONNECTED.equals(action)) {
+                if (mConnected) {
+                    Toast toast = Toast.makeText(getApplicationContext(),
+                            R.string.disconnected,
+                            Toast.LENGTH_SHORT);
+                    toast.show();
+                    mConnected = false;
+                }
             } else if (BLEService.ACTION_DATA_AVAILABLE.equals(action)) {
-                Toast toast = Toast.makeText(getApplicationContext(),
-                       "Data streaming",
-                        Toast.LENGTH_SHORT);
-                toast.show();
+                if (!mConnected) {
+                    Toast toast = Toast.makeText(getApplicationContext(),
+                            R.string.connected,
+                            Toast.LENGTH_SHORT);
+                    toast.show();
+                    mConnected = true;
+                }
             }
         }
     };

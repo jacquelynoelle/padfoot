@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,6 +20,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 import io.github.jacquelynoelle.padfoot.R;
 import io.github.jacquelynoelle.padfoot.bluetoothle.BLEDeviceAdapter;
@@ -80,8 +85,13 @@ public class BLEScanActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.ble, menu);
-        menu.findItem(R.id.menu_refresh).setVisible(true);
-        menu.findItem(R.id.menu_stop).setVisible(true);
+        if (mScanning) {
+            menu.findItem(R.id.menu_stop).setVisible(true);
+            menu.findItem(R.id.menu_refresh).setVisible(false);
+        } else {
+            menu.findItem(R.id.menu_stop).setVisible(false);
+            menu.findItem(R.id.menu_refresh).setVisible(true);
+        }
         menu.findItem(R.id.menu_home).setVisible(true);
         return true;
     }
@@ -101,8 +111,17 @@ public class BLEScanActivity extends AppCompatActivity
             case R.id.menu_home:
                 Intent homeIntent = new Intent(this, MainActivity.class);
                 startActivity(homeIntent);
+                break;
+            case R.id.menu_sign_out:
+                AuthUI.getInstance()
+                        .signOut(this)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            public void onComplete(@NonNull Task<Void> task) {
+                                Intent signOutIntent = new Intent(BLEScanActivity.this, SplashActivity.class);
+                                startActivity(signOutIntent);
+                            }
+                        });
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -167,6 +186,7 @@ public class BLEScanActivity extends AppCompatActivity
         intent.putExtra(EXTRAS_DEVICE_NAME, device.getName());
         intent.putExtra(EXTRAS_DEVICE_ADDRESS, device.getAddress());
         intent.putExtra("petID", petID);
+        intent.setAction(BLEService.ACTION_GATT_CONNECT);
         startService(intent);
 
         final Intent returnToStepCount = new Intent(this, MainActivity.class);

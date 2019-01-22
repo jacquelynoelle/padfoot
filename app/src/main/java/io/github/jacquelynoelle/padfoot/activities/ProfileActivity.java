@@ -3,6 +3,7 @@ package io.github.jacquelynoelle.padfoot.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -16,6 +17,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -78,6 +81,10 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
+        menu.findItem(R.id.menu_connect).setVisible(false);
+        menu.findItem(R.id.menu_disconnect).setVisible(false);
+        menu.findItem(R.id.menu_edit_profile).setVisible(false);
+        menu.findItem(R.id.menu_home).setVisible(false);
         menu.findItem(R.id.menu_sign_out).setVisible(true);
         return true;
     }
@@ -86,9 +93,14 @@ public class ProfileActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_sign_out:
-                AuthUI.getInstance().signOut(this);
-                Intent signOutIntent = new Intent(this, SplashActivity.class);
-                startActivity(signOutIntent);
+                AuthUI.getInstance()
+                        .signOut(this)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            public void onComplete(@NonNull Task<Void> task) {
+                                Intent signOutIntent = new Intent(ProfileActivity.this, SplashActivity.class);
+                                startActivity(signOutIntent);
+                            }
+                        });
                 break;
             default:
                 return super.onOptionsItemSelected(item);

@@ -60,21 +60,29 @@ public class BLEService extends Service {
     public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
     public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
 
+    public static final String ACTION_GATT_DISCONNECT = "com.example.bluetooth.le.ACTION_GATT_DISCONNECT";
+    public static final String ACTION_GATT_CONNECT = "com.example.bluetooth.le.ACTION_GATT_CONNECT";
+
     @Override
     public int onStartCommand (Intent intent, int flags, int startId) {
         mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
         mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
         mPetID = intent.getStringExtra("petID");
+        if (intent.getAction().equals(ACTION_GATT_DISCONNECT) && mConnectionState == STATE_CONNECTED) {
+            disconnect();
+//            stopSelf();
+            return START_NOT_STICKY;
+        } else {
+            if (!initialize()) {
+                Log.e(TAG, "Unable to initialize Bluetooth");
+            }
+            // Automatically connects to the device upon successful start-up initialization.
+            connect(mDeviceAddress);
+            mBluetoothGatt.discoverServices();
 
-        if (!initialize()) {
-            Log.e(TAG, "Unable to initialize Bluetooth");
+            super.onStartCommand(intent, flags, startId);
+            return START_REDELIVER_INTENT;
         }
-        // Automatically connects to the device upon successful start-up initialization.
-        connect(mDeviceAddress);
-        mBluetoothGatt.discoverServices();
-
-        super.onStartCommand(intent, flags, startId);
-        return START_REDELIVER_INTENT;
     }
 
     @Override
@@ -142,7 +150,7 @@ public class BLEService extends Service {
         }
         // We want to directly connect to the device, so we are setting the autoConnect
         // parameter to false.
-        mBluetoothGatt = device.connectGatt(this, true, mGattCallback);
+        mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
         Log.d(TAG, "Trying to create a new connection.");
         mDeviceAddress = address;
         mConnectionState = STATE_CONNECTING;
