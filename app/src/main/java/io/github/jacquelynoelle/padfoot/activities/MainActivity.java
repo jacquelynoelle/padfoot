@@ -273,7 +273,7 @@ public class MainActivity extends AppCompatActivity {
                 if (previousChildName == null) {
                     mWeeklyEntries.add(new BarEntry(0, dailySteps));
                 } else {
-                    mWeeklyEntries.add(new BarEntry(mWeeklyEntries.size(), dailySteps));
+                    mWeeklyEntries.add(new BarEntry(mWeeklyEntries.size() - 1, dailySteps));
                 }
 
                 if (mWeeklyEntries.size() > 7) {
