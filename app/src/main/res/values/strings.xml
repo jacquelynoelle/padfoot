@@ -6,7 +6,7 @@
     <string name="ble_not_supported">BLE is not supported</string>
     <string name="connected">Tracker connected</string>
     <string name="disconnected">Tracker disconnected</string>
-    <string name="connect_tracker">Connect a tracker</string>
+    <string name="connect_tracker">Connect tracker</string>
     <string name="error_bluetooth_not_supported">Bluetooth not supported.</string>
 
     <string name="unknown_device">Unknown device</string>
@@ -18,8 +18,8 @@
     <string name="menu_edit_profile">Edit profile</string>
     <string name="menu_connect">Connect tracker</string>
     <string name="menu_disconnect">Disconnect tracker</string>
-    <string name="menu_refresh">Refresh</string>
-    <string name="menu_stop">Stop scan</string>
+    <string name="menu_scan">Scan</string>
+    <string name="menu_stop">Stop</string>
     <string name="title_activity_login">Sign in</string>
     <string name="sign_out">Sign out</string>
 

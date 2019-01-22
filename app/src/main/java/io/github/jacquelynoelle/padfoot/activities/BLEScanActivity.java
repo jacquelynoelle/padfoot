@@ -19,6 +19,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -87,19 +88,21 @@ public class BLEScanActivity extends AppCompatActivity
         getMenuInflater().inflate(R.menu.ble, menu);
         if (mScanning) {
             menu.findItem(R.id.menu_stop).setVisible(true);
-            menu.findItem(R.id.menu_refresh).setVisible(false);
+            menu.findItem(R.id.menu_scan).setVisible(false);
+            menu.findItem(R.id.menu_refresh).setActionView(
+                    R.layout.actionbar_indeterminate_progress);
         } else {
             menu.findItem(R.id.menu_stop).setVisible(false);
-            menu.findItem(R.id.menu_refresh).setVisible(true);
+            menu.findItem(R.id.menu_scan).setVisible(true);
+            menu.findItem(R.id.menu_refresh).setActionView(null);
         }
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-//        TODO add scan in progress wheel?
         switch (item.getItemId()) {
-            case R.id.menu_refresh:
+            case R.id.menu_scan:
                 mAdapter = new BLEDeviceAdapter(this);
                 mDeviceList.setAdapter(mAdapter);
                 scanLeDevice(true);
@@ -187,6 +190,7 @@ public class BLEScanActivity extends AppCompatActivity
                 public void run() {
                     mScanning = false;
                     mBluetoothScanner.stopScan(mLeScanCallback);
+                    setProgressBarIndeterminateVisibility(false); // turn progress off
                     invalidateOptionsMenu();
                 }
             }, SCAN_PERIOD);
