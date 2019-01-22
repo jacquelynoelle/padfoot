@@ -102,11 +102,27 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-        menu.findItem(R.id.menu_connect).setVisible(true);
-        menu.findItem(R.id.menu_disconnect).setVisible(true);
+        if (!mConnected) {
+            menu.findItem(R.id.menu_connect).setVisible(true);
+            menu.findItem(R.id.menu_disconnect).setVisible(false);
+        } else {
+            menu.findItem(R.id.menu_connect).setVisible(false);
+            menu.findItem(R.id.menu_disconnect).setVisible(true);
+        }
         menu.findItem(R.id.menu_edit_profile).setVisible(true);
-        menu.findItem(R.id.menu_home).setVisible(false);
         menu.findItem(R.id.menu_sign_out).setVisible(true);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (!mConnected) {
+            menu.findItem(R.id.menu_connect).setVisible(true);
+            menu.findItem(R.id.menu_disconnect).setVisible(false);
+        } else {
+            menu.findItem(R.id.menu_connect).setVisible(false);
+            menu.findItem(R.id.menu_disconnect).setVisible(true);
+        }
         return true;
     }
 
@@ -125,10 +141,6 @@ public class MainActivity extends AppCompatActivity {
             case R.id.menu_edit_profile:
                 final Intent editProfileIntent = new Intent(this, EditProfileActivity.class);
                 startActivity(editProfileIntent);
-                break;
-            case R.id.menu_home:
-                Intent homeIntent = new Intent(this, MainActivity.class);
-                startActivity(homeIntent);
                 break;
             case R.id.menu_sign_out:
                 AuthUI.getInstance()
@@ -257,7 +269,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String previousChildName) {
                 int dailySteps = dataSnapshot.getValue(Integer.class) == null ? 0 : dataSnapshot.getValue(Integer.class);
-
 
                 if (previousChildName == null) {
                     mWeeklyEntries.add(new BarEntry(0, dailySteps));

@@ -92,7 +92,6 @@ public class BLEScanActivity extends AppCompatActivity
             menu.findItem(R.id.menu_stop).setVisible(false);
             menu.findItem(R.id.menu_refresh).setVisible(true);
         }
-        menu.findItem(R.id.menu_home).setVisible(true);
         return true;
     }
 
@@ -108,19 +107,6 @@ public class BLEScanActivity extends AppCompatActivity
             case R.id.menu_stop:
                 scanLeDevice(false);
                 break;
-            case R.id.menu_home:
-                Intent homeIntent = new Intent(this, MainActivity.class);
-                startActivity(homeIntent);
-                break;
-            case R.id.menu_sign_out:
-                AuthUI.getInstance()
-                        .signOut(this)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            public void onComplete(@NonNull Task<Void> task) {
-                                Intent signOutIntent = new Intent(BLEScanActivity.this, SplashActivity.class);
-                                startActivity(signOutIntent);
-                            }
-                        });
         }
         return super.onOptionsItemSelected(item);
     }

@@ -155,53 +155,6 @@ public class EditProfileActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        menu.findItem(R.id.menu_connect).setVisible(true);
-        menu.findItem(R.id.menu_disconnect).setVisible(false);
-        menu.findItem(R.id.menu_edit_profile).setVisible(false);
-        menu.findItem(R.id.menu_home).setVisible(true);
-        menu.findItem(R.id.menu_sign_out).setVisible(true);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_connect:
-                final Intent bleConnectIntent = new Intent(this, BLEScanActivity.class);
-                startActivity(bleConnectIntent);
-                break;
-//            case R.id.menu_disconnect:
-//                final Intent bleDisconnectIntent = new Intent(this, BLEScanActivity.class);
-//                startActivity(bleDisconnectIntent);
-//                break;
-            case R.id.menu_edit_profile:
-                final Intent editProfileIntent = new Intent(this, EditProfileActivity.class);
-//                editProfileIntent.putExtra("petID", getIntent().getStringExtra("petID"));
-                startActivity(editProfileIntent);
-                break;
-            case R.id.menu_home:
-                Intent homeIntent = new Intent(this, MainActivity.class);
-                startActivity(homeIntent);
-                break;
-            case R.id.menu_sign_out:
-                AuthUI.getInstance()
-                        .signOut(this)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            public void onComplete(@NonNull Task<Void> task) {
-                                Intent signOutIntent = new Intent(EditProfileActivity.this, SplashActivity.class);
-                                startActivity(signOutIntent);
-                            }
-                        });
-                break;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-        return true;
-    }
-
     private void getCurrentDetailsFromFirebase(final FirebasePetCallback callback) {
         ValueEventListener listener = new ValueEventListener() {
             @Override

@@ -84,7 +84,6 @@ public class ProfileActivity extends AppCompatActivity {
         menu.findItem(R.id.menu_connect).setVisible(false);
         menu.findItem(R.id.menu_disconnect).setVisible(false);
         menu.findItem(R.id.menu_edit_profile).setVisible(false);
-        menu.findItem(R.id.menu_home).setVisible(false);
         menu.findItem(R.id.menu_sign_out).setVisible(true);
         return true;
     }
