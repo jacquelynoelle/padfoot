@@ -12,6 +12,7 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -22,6 +23,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
+
+import io.github.jacquelynoelle.padfoot.R;
 
 public class BLEService extends Service {
 
@@ -69,8 +72,6 @@ public class BLEService extends Service {
         // Automatically connects to the device upon successful start-up initialization.
         connect(mDeviceAddress);
         mBluetoothGatt.discoverServices();
-
-        mRightNow = Calendar.getInstance();
 
         super.onStartCommand(intent, flags, startId);
         return START_REDELIVER_INTENT;
@@ -322,37 +323,33 @@ public class BLEService extends Service {
         // TODO: consider using LocalBroadcastManager.sendBroadcast, or use permissions
         // more info here: https://developer.android.com/guide/components/broadcasts
         database = FirebaseDatabase.getInstance().getReference();
+        mRightNow = Calendar.getInstance();
 
         // Special handling for Step Count characteristic
         if (BLEGattAttributes.STEP_COUNT.equals(characteristic.getUuid().toString())) {
-//            TODO: Not sure why it was coming through as an 8-bit integer instead of 16
-//            int flag = characteristic.getProperties();
-//            int format;
-//            if ((flag & 0x01) != 0) {
-//                format = BluetoothGattCharacteristic.FORMAT_UINT16;
-//                Log.d(TAG, "Step count format UINT16.");
-//            } else {
-//                format = BluetoothGattCharacteristic.FORMAT_UINT8;
-//                Log.d(TAG, "Step count format UINT8.");
-//            }
 
             int hour = mRightNow.get(Calendar.HOUR_OF_DAY); // TODO this value is not resetting unless app is restarted.. cached?
-            int min = mRightNow.get(Calendar.MINUTE);
-            int sec = mRightNow.get(Calendar.SECOND);
 
             String currentHour = Integer.toString(hour);
             String today = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
 
             final int stepCount = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0);
-//            Log.d(TAG, String.format("Received step count: %d", stepCount));
-//            intent.putExtra(EXTRA_DATA, String.valueOf(stepCount));
 
-            if (hour == 0 && min == 0 && sec < 5) {
-                database.child("pets").child(mPetID).child("hourlySteps").setValue(null); // TODO move to google cloud functions
-            } else {
-                database.child("pets").child(mPetID).child("hourlySteps").child(currentHour).setValue(stepCount);
-                database.child("pets").child(mPetID).child("dailySteps").child(today).setValue(stepCount);
+            String hourKey = "hour_" + hour;
+            SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.app_file), Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putInt(hourKey, stepCount);
+            editor.apply();
+
+            int dailyStepCount = 0;
+            for (int i = 0; i < 24; i++) {
+                String key = "hour_" + i;
+                int count = sharedPref.getInt(key, 0);
+                dailyStepCount += count;
             }
+
+            database.child("pets").child(mPetID).child("hourlySteps").child(currentHour).setValue(stepCount);
+            database.child("pets").child(mPetID).child("dailySteps").child(today).setValue(dailyStepCount);
         } else {
             // For all other profiles, writes the data formatted in HEX.
             final byte[] data = characteristic.getValue();

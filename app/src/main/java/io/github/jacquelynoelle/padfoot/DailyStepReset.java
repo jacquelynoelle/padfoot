@@ -36,12 +36,17 @@ public class DailyStepReset extends IntentService {
 
             // triggered at midnight, need to create new day entry and start step count at 0
             // important to have log of all days (even with no step count due to no connection) for graph purposes
-            mPetsReference.child(mPetID).child("dailySteps").child(mToday).setValue(99);
+            mPetsReference.child(mPetID).child("dailySteps").child(mToday).setValue(0);
 
-            // reset hourly totals for current day
+            SharedPreferences.Editor editor = sharedPref.edit();
+
+            // reset hourly totals for current day in Firebase and SharedPref
             for(int i = 0; i < 24; i++) {
                 mPetsReference.child(mPetID).child("hourlySteps").child(Integer.toString(i)).setValue(0);
+                String key = "hour_" + i;
+                editor.putInt(key, 0);
             }
+            editor.apply();
         }
     }
 }

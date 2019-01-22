@@ -258,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
                     mWeeklyEntries.add(new BarEntry(mWeeklyEntries.size(), dailySteps));
                 }
 
-                if (previousChildName == null || mWeeklyEntries.size() > 7) {
+                if (mWeeklyEntries.size() > 7) {
                     mWeeklyEntries.remove(0);
                 }
 
@@ -323,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(false);
         xAxis.setAxisMinimum(-0.5f);
-        xAxis.setAxisMaximum(24);
+        xAxis.setAxisMaximum(24.5f);
 
         mHourlyChart.getAxisLeft().setEnabled(false);
         mHourlyChart.getAxisRight().setEnabled(false);
@@ -370,7 +370,7 @@ public class MainActivity extends AppCompatActivity {
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(false);
         xAxis.setAxisMinimum(-0.5f);
-        xAxis.setAxisMaximum(6);
+        xAxis.setAxisMaximum(6.5f);
 
         mWeeklyChart.getAxisLeft().setEnabled(false);
         mWeeklyChart.getAxisRight().setEnabled(false);
