@@ -17,9 +17,7 @@ import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -28,7 +26,6 @@ import android.widget.Toast;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
@@ -42,6 +39,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import com.firebase.ui.auth.AuthUI;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
@@ -297,11 +295,11 @@ public class MainActivity extends AppCompatActivity {
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String previousChildName) {
                 int currentDaySteps = dataSnapshot.getValue(Integer.class) == null ? 0 : dataSnapshot.getValue(Integer.class);
 
-                if (previousChildName == null) {
-                    mWeeklyEntries.add(new BarEntry(0, currentDaySteps));
-                } else {
-                    mWeeklyEntries.add(new BarEntry(mWeeklyEntries.size() - 1, currentDaySteps));
+                if (mWeeklyEntries.size() == 1 && mWeeklyEntries.get(0).getY() == -1) {
+                    mWeeklyEntries.remove(0);
                 }
+
+                mWeeklyEntries.add(new BarEntry(mWeeklyEntries.size(), currentDaySteps));
 
                 if (mWeeklyEntries.size() > 7) {
                     mWeeklyEntries.remove(0);
@@ -331,7 +329,9 @@ public class MainActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {}
         };
 
-        database.child("pets").child(mPetID).child("dailySteps").orderByKey().limitToLast(7).addChildEventListener(mWeeklyStepCountListener);
+        DatabaseReference dailyStepsRef = database.child("pets").child(mPetID).child("dailySteps");
+        Query lastWeek = dailyStepsRef.orderByKey().limitToLast(7);
+        lastWeek.addChildEventListener(mWeeklyStepCountListener);
     }
 
     private void detachDatabaseReadListeners() {
@@ -372,7 +372,7 @@ public class MainActivity extends AppCompatActivity {
 
         mHourlyChart.getLegend().setEnabled(false);   // Hide the legend
 
-        mHourlyEntries.add(new BarEntry(0, 0)); // Add a single placeholder until data comes back from Firebase
+        mHourlyEntries.add(new BarEntry(0, -1)); // Add a single placeholder until data comes back from Firebase
 
         BarDataSet barDataSet = new BarDataSet(mHourlyEntries, "Cells");
         barDataSet.setHighlightEnabled(true);
@@ -419,7 +419,7 @@ public class MainActivity extends AppCompatActivity {
 
         mWeeklyChart.getLegend().setEnabled(false);   // Hide the legend
 
-        mWeeklyEntries.add(new BarEntry(0, 0));
+        mWeeklyEntries.add(new BarEntry(0, -1));
 
         BarDataSet barDataSet = new BarDataSet(mWeeklyEntries, "Cells");
         barDataSet.setHighlightEnabled(true);
