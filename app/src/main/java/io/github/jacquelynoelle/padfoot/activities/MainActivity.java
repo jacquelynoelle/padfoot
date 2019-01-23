@@ -12,12 +12,16 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -195,6 +199,16 @@ public class MainActivity extends AppCompatActivity {
         int num = display.getRotation();
         if (num == 1 || num == 3) {
             background.setBackgroundColor(getColor(R.color.colorPrimaryLight));
+
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(1000, 1000);
+            lp.setMargins(0, 0, 80, 0);
+
+            CardView card1 = findViewById(R.id.card_steps);
+            card1.setLayoutParams(lp);
+            CardView card2 = findViewById(R.id.card_hourly);
+            card2.setLayoutParams(lp);
+            CardView card3 = findViewById(R.id.card_weekly);
+            card3.setLayoutParams(lp);
         } else {
             background.setBackground(portrait);
         }
@@ -266,12 +280,7 @@ public class MainActivity extends AppCompatActivity {
                 mHourlyChart.getAxisLeft().resetAxisMaximum();
                 mHourlyEntries.set(currentHour, new BarEntry(currentHour, currentHourSteps));
 
-                if (currentHourSteps > mHourlyChart.getAxisLeft().getAxisMaximum()) {
-                    mHourlyChart.getAxisLeft().setAxisMaximum(currentHourSteps + 100);
-                }
-
-                mHourlyChart.notifyDataSetChanged();
-                // we don't invalidate here because the chart would be reloading too often
+                // only set the data here because the chart would be reloading too often
                 // chart will reload on resume because it will trigger new child added
             }
             public void onChildRemoved(DataSnapshot dataSnapshot) {}
@@ -286,20 +295,20 @@ public class MainActivity extends AppCompatActivity {
         mWeeklyStepCountListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String previousChildName) {
-                int dailySteps = dataSnapshot.getValue(Integer.class) == null ? 0 : dataSnapshot.getValue(Integer.class);
+                int currentDaySteps = dataSnapshot.getValue(Integer.class) == null ? 0 : dataSnapshot.getValue(Integer.class);
 
                 if (previousChildName == null) {
-                    mWeeklyEntries.add(new BarEntry(0, dailySteps));
+                    mWeeklyEntries.add(new BarEntry(0, currentDaySteps));
                 } else {
-                    mWeeklyEntries.add(new BarEntry(mWeeklyEntries.size() - 1, dailySteps));
+                    mWeeklyEntries.add(new BarEntry(mWeeklyEntries.size() - 1, currentDaySteps));
                 }
 
                 if (mWeeklyEntries.size() > 7) {
                     mWeeklyEntries.remove(0);
                 }
 
-                if (dailySteps > mWeeklyChart.getAxisLeft().getAxisMaximum()) {
-                    mWeeklyChart.getAxisLeft().setAxisMaximum(dailySteps + 100);
+                if (currentDaySteps > mWeeklyChart.getAxisLeft().getAxisMaximum()) {
+                    mWeeklyChart.getAxisLeft().setAxisMaximum(currentDaySteps + 100);
                 }
 
                 mWeeklyChart.notifyDataSetChanged();
@@ -314,12 +323,7 @@ public class MainActivity extends AppCompatActivity {
                 mWeeklyChart.getAxisLeft().resetAxisMaximum();
                 mWeeklyEntries.set(TODAY, new BarEntry(TODAY, currentDaySteps));
 
-                if (currentDaySteps > mWeeklyChart.getAxisLeft().getAxisMaximum()) {
-                    mWeeklyChart.getAxisLeft().setAxisMaximum(currentDaySteps + 100);
-                }
-
-                mWeeklyChart.notifyDataSetChanged();
-                // we don't invalidate here because the chart would be reloading too often
+                // only set the data here because the chart would be reloading too often
                 // chart will reload on resume because it will trigger new child added
             }
             public void onChildRemoved(DataSnapshot dataSnapshot) {}
@@ -361,7 +365,7 @@ public class MainActivity extends AppCompatActivity {
         xAxis.setAxisMinimum(-0.5f);
         xAxis.setAxisMaximum(24.5f);
 
-        mHourlyChart.getAxisLeft().setEnabled(false);
+        mHourlyChart.getAxisLeft().setEnabled(true);
         mHourlyChart.getAxisRight().setEnabled(false);
         mHourlyChart.getAxisLeft().setAxisMinimum(0f);
         mHourlyChart.getAxisLeft().setAxisMaximum(1000f);
@@ -408,7 +412,7 @@ public class MainActivity extends AppCompatActivity {
         xAxis.setAxisMinimum(-0.5f);
         xAxis.setAxisMaximum(6.5f);
 
-        mWeeklyChart.getAxisLeft().setEnabled(false);
+        mWeeklyChart.getAxisLeft().setEnabled(true);
         mWeeklyChart.getAxisRight().setEnabled(false);
         mWeeklyChart.getAxisLeft().setAxisMinimum(0f);
         mHourlyChart.getAxisLeft().setAxisMaximum(1000f);
