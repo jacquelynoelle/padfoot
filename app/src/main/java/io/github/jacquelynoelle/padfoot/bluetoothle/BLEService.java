@@ -341,23 +341,28 @@ public class BLEService extends Service {
             String currentHour = Integer.toString(hour);
             String today = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
 
-            final int stepCount = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0);
+//            final int stepCount = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0);
+//
+//            String hourKey = "hour_" + hour;
+//            SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.app_file), Context.MODE_PRIVATE);
+//            SharedPreferences.Editor editor = sharedPref.edit();
+//            editor.putInt(hourKey, stepCount);
+//            editor.apply();
+//
+//            int dailyStepCount = 0;
+//            for (int i = 0; i < 24; i++) {
+//                String key = "hour_" + i;
+//                int count = sharedPref.getInt(key, 0);
+//                dailyStepCount += count;
+//            }
+//
+//            database.child("pets").child(mPetID).child("hourlySteps").child(currentHour).setValue(stepCount);
+//            database.child("pets").child(mPetID).child("dailySteps").child(today).setValue(dailyStepCount);
 
-            String hourKey = "hour_" + hour;
-            SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.app_file), Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putInt(hourKey, stepCount);
-            editor.apply();
+            final int stepCount = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT32, 0);
+            database.child("sample-data").child(Long.toString(mRightNow.getTimeInMillis())).setValue(stepCount);
 
-            int dailyStepCount = 0;
-            for (int i = 0; i < 24; i++) {
-                String key = "hour_" + i;
-                int count = sharedPref.getInt(key, 0);
-                dailyStepCount += count;
-            }
 
-            database.child("pets").child(mPetID).child("hourlySteps").child(currentHour).setValue(stepCount);
-            database.child("pets").child(mPetID).child("dailySteps").child(today).setValue(dailyStepCount);
         } else {
             // For all other profiles, writes the data formatted in HEX.
             final byte[] data = characteristic.getValue();
