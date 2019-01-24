@@ -25,7 +25,9 @@ import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
@@ -433,10 +435,21 @@ public class MainActivity extends AppCompatActivity {
         xAxis.setAxisMinimum(-0.5f);
         xAxis.setAxisMaximum(6.5f);
 
-        mWeeklyChart.getAxisLeft().setEnabled(false);
         mWeeklyChart.getAxisRight().setEnabled(false);
-        mWeeklyChart.getAxisLeft().setAxisMinimum(0f);
-        mWeeklyChart.getAxisLeft().setAxisMaximum(1000f);
+
+        YAxis yAxis = mWeeklyChart.getAxisLeft();
+        yAxis.setEnabled(true);
+        yAxis.setAxisMinimum(0f);
+        yAxis.setAxisMaximum(1000f);
+        yAxis.setDrawAxisLine(false);
+        yAxis.setDrawGridLines(false);
+        yAxis.setDrawLabels(false);
+
+        LimitLine goalLine = new LimitLine(mStepGoal);
+        goalLine.setLineWidth(1f);
+        goalLine.setLineColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        goalLine.enableDashedLine(8f, 12f, 0);
+        yAxis.addLimitLine(goalLine);
 
         mWeeklyChart.getLegend().setEnabled(false);   // Hide the legend
 
