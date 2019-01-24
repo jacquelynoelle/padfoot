@@ -163,12 +163,15 @@ public class ProfileActivity extends AppCompatActivity {
         editor.putString("petBreed", newPet.getBreed());
         editor.putString("petBirthday", newPet.getBirthday());
         editor.putInt("petStepGoal", newPet.getStepGoal());
-        editor.apply();
 
-        // create hourly step count placeholders
+        // create hourly step count placeholders and clear out any previous user's data from pref
         for (int i = 0; i < 24; i++) {
             petReference.child("hourlySteps").child(Integer.toString(i)).setValue(0);
+            String hourKey = "hour_" + i;
+            editor.putInt(hourKey, 0);
         }
+
+        editor.apply();
 
         // update petID in user
         usersReference.child(newPet.getOwnerID()).child("petID").setValue(petID);
