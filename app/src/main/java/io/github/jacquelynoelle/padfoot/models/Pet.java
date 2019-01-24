@@ -14,6 +14,7 @@ public class Pet {
     private String size;
     private String breed;
     private String birthday;
+    private int stepGoal;
     private ArrayList challenges;
 
     /* Two constructors:
@@ -70,6 +71,14 @@ public class Pet {
         this.birthday = birthday;
     }
 
+    public int getStepGoal() {
+        return stepGoal;
+    }
+
+    public void setStepGoal(int stepGoal) {
+        this.stepGoal = stepGoal;
+    }
+
     public ArrayList getChallenges() {
         return challenges;
     }
@@ -84,6 +93,7 @@ public class Pet {
         map.put("size", size);
         map.put("breed", breed);
         map.put("birthday", birthday);
+        map.put("stepGoal", stepGoal);
 
         return map;
     }

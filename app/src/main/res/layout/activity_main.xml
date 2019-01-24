@@ -25,7 +25,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="16dp"
+                android:weightSum="100" >
 
                 <TextView
                     android:id="@+id/tv_step_count_header"
@@ -39,11 +40,22 @@
                 <TextView
                     android:id="@+id/tv_step_count"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
+                    android:layout_height="wrap_content"
+                    android:gravity="bottom|center"
                     android:text="@string/step_count_placeholder"
                     android:textColor="@color/colorPrimary"
-                    android:textSize="48sp" />
+                    android:textSize="48sp"
+                    android:layout_weight="50" />
+
+                <TextView
+                    android:id="@+id/tv_to_goal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top|center"
+                    android:text="@string/step_count_goal_placeholder"
+                    android:textColor="@color/colorPrimaryLight"
+                    android:textSize="12sp"
+                    android:textAllCaps="true" />
             </LinearLayout>
         </android.support.v7.widget.CardView>
 

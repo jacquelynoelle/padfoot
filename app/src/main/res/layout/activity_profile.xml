@@ -81,6 +81,23 @@
                 android:layout_marginBottom="16dp"
                 android:startYear="2000" />
 
+            <!-- Step Goal -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/profile_step_goal"
+                android:textAllCaps="true" />
+
+            <Spinner
+                android:id="@+id/sp_stepgoal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:paddingTop="8dp"
+                android:hint="@string/select"
+                android:prompt="@string/select"
+                android:spinnerMode="dropdown" />
+
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

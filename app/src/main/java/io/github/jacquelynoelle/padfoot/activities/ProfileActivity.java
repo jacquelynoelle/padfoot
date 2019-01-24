@@ -19,6 +19,7 @@ import android.widget.Spinner;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -32,6 +33,7 @@ public class ProfileActivity extends AppCompatActivity {
     Spinner petSizeSpinner;
     AutoCompleteTextView breedACTextView;
     DatePicker birthdayPicker;
+    Spinner stepGoalSpinner;
     Button submitButton;
     FirebaseDatabase database;
     DatabaseReference usersReference;
@@ -52,6 +54,7 @@ public class ProfileActivity extends AppCompatActivity {
         petSizeSpinner = findViewById(R.id.sp_pet_size);
         breedACTextView = findViewById(R.id.ac_breed);
         birthdayPicker = findViewById(R.id.dp_birthday);
+        stepGoalSpinner = findViewById(R.id.sp_stepgoal);
 
         petSizeSpinner.setAdapter(new ArrayAdapter<PetSize>(this,
                 android.R.layout.simple_spinner_item, PetSize.values()));
@@ -60,6 +63,12 @@ public class ProfileActivity extends AppCompatActivity {
         breedACTextView.setAdapter(new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line,
                 getResources().getStringArray(R.array.breeds_array)));
+
+        Integer[] stepGoalChoices = { 8000, 12000, 16000, 20000 };
+        final ArrayAdapter<Integer> stepGoalAdapter = new ArrayAdapter<Integer>(this,
+                android.R.layout.simple_spinner_item, stepGoalChoices);
+        stepGoalSpinner.setAdapter(stepGoalAdapter);
+        stepGoalSpinner.setSelection(stepGoalAdapter.getPosition(12000)); // default to 12000
 
         submitButton = findViewById(R.id.b_profile_submit);
 
@@ -123,9 +132,11 @@ public class ProfileActivity extends AppCompatActivity {
         String petSize = petSizeSpinner.getSelectedItem().toString();
         String petBreed = breedACTextView.getText().toString();
         String petBirthday = getDateFromDatePicker(birthdayPicker);
+        int petStepGoal = (Integer) stepGoalSpinner.getSelectedItem();
 
         // create Pet object
-        String ownerID = getIntent().getStringExtra("userID");
+        SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.app_file), Context.MODE_PRIVATE);
+        String ownerID = sharedPref.getString("userID", FirebaseAuth.getInstance().getCurrentUser().getUid());
         Pet newPet = new Pet(petName, ownerID);
         newPet.setSize(petSize);
         if (petBreed.equals("")) {
@@ -133,6 +144,7 @@ public class ProfileActivity extends AppCompatActivity {
         }
         newPet.setBreed(petBreed);
         newPet.setBirthday(petBirthday);
+        newPet.setStepGoal(petStepGoal);
 
         return newPet;
     }
@@ -150,7 +162,13 @@ public class ProfileActivity extends AppCompatActivity {
         editor.putString("petSize", newPet.getSize());
         editor.putString("petBreed", newPet.getBreed());
         editor.putString("petBirthday", newPet.getBirthday());
+        editor.putInt("petStepGoal", newPet.getStepGoal());
         editor.apply();
+
+        // create hourly step count placeholders
+        for (int i = 0; i < 24; i++) {
+            petReference.child("hourlySteps").child(Integer.toString(i)).setValue(0);
+        }
 
         // update petID in user
         usersReference.child(newPet.getOwnerID()).child("petID").setValue(petID);

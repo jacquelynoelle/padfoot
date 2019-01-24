@@ -127,29 +127,25 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void routeUser(FirebaseUser firebaseUser) {
-        // TODO: Check BLE connection
         if (currentUser.getPetID() != null) {
             Log.i(TAG, "routeUser: already setup pet profile");
             Intent signedInIntent = new Intent(SplashActivity.this, MainActivity.class);
-//            signedInIntent.putExtra("userID", firebaseUser.getUid());
-//            signedInIntent.putExtra("petID", currentUser.getPetID());
 
             SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.app_file), Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString("userID", firebaseUser.getUid());
             editor.putString("petID", currentUser.getPetID());
-            editor.apply();
+            editor.commit();
 
             startActivity(signedInIntent);
         } else {
-            Log.i(TAG, "routeUser: already setup pet profile");
+            Log.i(TAG, "routeUser: has not setup pet profile");
             Intent loginNewUser = new Intent(SplashActivity.this, ProfileActivity.class);
-//            loginNewUser.putExtra("userID", firebaseUser.getUid());
 
-            SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.app_file), Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString("userID", firebaseUser.getUid());
-            editor.apply();
+            editor.commit();
 
             startActivity(loginNewUser);
         }

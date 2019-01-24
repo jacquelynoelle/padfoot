@@ -29,7 +29,6 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.formatter.StackedValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -57,11 +56,13 @@ public class MainActivity extends AppCompatActivity {
 
     private final static String TAG = MainActivity.class.getSimpleName();
 
-    private TextView displayText;
+    private TextView stepCountDisplay;
+    private TextView toGoalDisplay;
     private DatabaseReference database;
     private String mPetID;
 
     private Integer mStepCount;
+    private Integer mStepGoal;
     private ValueEventListener mStepCountListener;
 
     private BarChart mHourlyChart;
@@ -90,11 +91,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        displayText = findViewById(R.id.tv_step_count);
+        stepCountDisplay = findViewById(R.id.tv_step_count);
+        toGoalDisplay = findViewById(R.id.tv_to_goal);
         database = FirebaseDatabase.getInstance().getReference();
 
         SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.app_file), Context.MODE_PRIVATE);
         mPetID = sharedPref.getString("petID", "test");
+        mStepGoal = sharedPref.getInt("stepGoal", 12000);
 
         mHourlyChart = findViewById(R.id.chart_hourly);
         mHourlyEntries = new ArrayList<>();
@@ -239,9 +242,17 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 mStepCount = dataSnapshot.getValue(Integer.class);
                 if (mStepCount != null) {
-                    displayText.setText(Integer.toString(mStepCount));
+                    stepCountDisplay.setText(Integer.toString(mStepCount));
+                    int percentToGoal = mStepCount / mStepGoal;
+                    String percentToGoalString = Integer.toString(percentToGoal) + "% to goal";
+                    if (percentToGoal == 0 && mStepCount > 0) {
+                        toGoalDisplay.setText("<1% to goal");
+                    } else {
+                        toGoalDisplay.setText(percentToGoalString);
+                    }
                 } else {
-                    displayText.setText("0");
+                    stepCountDisplay.setText("0");
+                    toGoalDisplay.setText("0% to goal");
                 }
             }
 
@@ -322,7 +333,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, String previousChildName) {
-                final int TODAY = 6;
+                final int TODAY = mWeeklyEntries.size() - 1;
                 int currentDaySteps = dataSnapshot.getValue(Integer.class) == null ? 0 : dataSnapshot.getValue(Integer.class);
 
                 mWeeklyChart.getAxisLeft().resetAxisMaximum();

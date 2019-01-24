@@ -45,6 +45,7 @@
     <string name="profile_breed">Breed</string>
     <string name="profile_breed_example">Australian Shepherd</string>
     <string name="profile_birthday">Birthday</string>
+    <string name="profile_step_goal">Step goal</string>
     <string-array name="breeds_array">
         <item>Australian Shepherd</item>
         <item>Border Collie</item>
@@ -63,4 +64,5 @@
     <string name="hourly_chart_header">Hourly Breakdown</string>
     <string name="weekly_chart_header">Last 7 days</string>
     <string name="step_count_placeholder">--</string>
+    <string name="step_count_goal_placeholder">--% to goal</string>
 </resources>

@@ -3,12 +3,9 @@ package io.github.jacquelynoelle.padfoot.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -17,9 +14,6 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.firebase.ui.auth.AuthUI;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -45,6 +39,7 @@ public class EditProfileActivity extends AppCompatActivity {
     Spinner petSizeSpinner;
     AutoCompleteTextView breedACTextView;
     DatePicker birthdayPicker;
+    Spinner stepGoalSpinner;
     Button updateButton;
     FirebaseDatabase database;
     DatabaseReference petsReference;
@@ -72,6 +67,7 @@ public class EditProfileActivity extends AppCompatActivity {
         petSizeSpinner = findViewById(R.id.sp_pet_size);
         breedACTextView = findViewById(R.id.ac_breed);
         birthdayPicker = findViewById(R.id.dp_birthday);
+        stepGoalSpinner = findViewById(R.id.sp_stepgoal);
 
         final ArrayAdapter<PetSize> petSizeAdapter = new ArrayAdapter<PetSize>(this,
                 android.R.layout.simple_spinner_item, PetSize.values());
@@ -81,6 +77,12 @@ public class EditProfileActivity extends AppCompatActivity {
         breedACTextView.setAdapter(new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line,
                 getResources().getStringArray(R.array.breeds_array)));
+
+        Integer[] stepGoalChoices = { 8000, 12000, 16000, 20000 };
+        final ArrayAdapter<Integer> stepGoalAdapter = new ArrayAdapter<Integer>(this,
+                android.R.layout.simple_spinner_item, stepGoalChoices);
+        stepGoalSpinner.setAdapter(stepGoalAdapter);
+        stepGoalSpinner.setSelection(stepGoalAdapter.getPosition(12000)); // default to 12000 TODO
 
         updateButton = findViewById(R.id.b_profile_submit);
         updateButton.setText(R.string.update);
@@ -93,7 +95,6 @@ public class EditProfileActivity extends AppCompatActivity {
                 // send to main step count activity
                 Intent updateProfileIntent = new Intent();
                 updateProfileIntent.setClass(EditProfileActivity.this, MainActivity.class);
-//                updateProfileIntent.putExtra("petID", mPetID);
                 startActivity(updateProfileIntent);
                 finish();
             }
@@ -147,10 +148,11 @@ public class EditProfileActivity extends AppCompatActivity {
                         size = PetSize.EXTRA_LARGE;
                         break;
                     default:
-                        size = PetSize.MEDIUM;
+                        size = PetSize.MEDIUM; // default to Medium
                 }
 
-                petSizeSpinner.setSelection(petSizeAdapter.getPosition(size)); // default to Medium
+                petSizeSpinner.setSelection(petSizeAdapter.getPosition(size));
+                stepGoalSpinner.setSelection(stepGoalAdapter.getPosition(pet.getStepGoal()));
             }
         });
     }
@@ -187,6 +189,7 @@ public class EditProfileActivity extends AppCompatActivity {
         String petSize = petSizeSpinner.getSelectedItem().toString();
         String petBreed = breedACTextView.getText().toString();
         String petBirthday = getDateFromDatePicker(birthdayPicker);
+        int petStepGoal = (Integer) stepGoalSpinner.getSelectedItem();
 
         // create Pet object
         String ownerID = getIntent().getStringExtra("userID");
@@ -197,6 +200,7 @@ public class EditProfileActivity extends AppCompatActivity {
         }
         newPet.setBreed(petBreed);
         newPet.setBirthday(petBirthday);
+        newPet.setStepGoal(petStepGoal);
 
         return newPet;
     }
@@ -208,6 +212,7 @@ public class EditProfileActivity extends AppCompatActivity {
         editor.putString("petSize", newPet.getSize());
         editor.putString("petBreed", newPet.getBreed());
         editor.putString("petBirthday", newPet.getBirthday());
+        editor.putInt("petStepGoal", newPet.getStepGoal());
         editor.apply();
 
         HashMap petMap = newPet.toMap();
