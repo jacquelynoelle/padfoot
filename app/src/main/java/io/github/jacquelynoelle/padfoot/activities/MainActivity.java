@@ -101,7 +101,6 @@ public class MainActivity extends AppCompatActivity {
 
         mSharedPref = this.getSharedPreferences(getString(R.string.app_file), Context.MODE_PRIVATE);
         mPetID = mSharedPref.getString("petID", "test");
-        mStepGoal = mSharedPref.getInt("stepGoal", 12000);
 
         mHourlyChart = findViewById(R.id.chart_hourly);
         mHourlyEntries = new ArrayList<>();
@@ -178,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         loadBackground();
 
+        mStepGoal = mSharedPref.getInt("petStepGoal", 12000);
         mToday = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
         mRightNow = Calendar.getInstance();
 
