@@ -249,11 +249,11 @@ public class MainActivity extends AppCompatActivity {
                 mStepCount = dataSnapshot.getValue(Integer.class);
                 if (mStepCount != null) {
                     stepCountDisplay.setText(Integer.toString(mStepCount));
-                    int percentToGoal = mStepCount / mStepGoal;
-                    String percentToGoalString = Integer.toString(percentToGoal) + "% to goal";
-                    if (percentToGoal == 0 && mStepCount > 0) {
+                    float percentToGoal = ((mStepCount * 1f) / mStepGoal) * 100;
+                    if (percentToGoal < 1 && mStepCount > 0) {
                         toGoalDisplay.setText("<1% to goal");
                     } else {
+                        String percentToGoalString = Integer.toString(Math.round(percentToGoal)) + "% to goal";
                         toGoalDisplay.setText(percentToGoalString);
                     }
                 } else {
