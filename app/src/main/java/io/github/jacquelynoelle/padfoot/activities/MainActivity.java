@@ -84,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
     private PendingIntent alarmIntent;
     private static final int REQUEST_CODE = 0; // for alarm
 
+    private SharedPreferences mSharedPref;
+
     private boolean mConnected = false;
 
     @Override
@@ -97,9 +99,9 @@ public class MainActivity extends AppCompatActivity {
         toGoalDisplay = findViewById(R.id.tv_to_goal);
         database = FirebaseDatabase.getInstance().getReference();
 
-        SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.app_file), Context.MODE_PRIVATE);
-        mPetID = sharedPref.getString("petID", "test");
-        mStepGoal = sharedPref.getInt("stepGoal", 12000);
+        mSharedPref = this.getSharedPreferences(getString(R.string.app_file), Context.MODE_PRIVATE);
+        mPetID = mSharedPref.getString("petID", "test");
+        mStepGoal = mSharedPref.getInt("stepGoal", 12000);
 
         mHourlyChart = findViewById(R.id.chart_hourly);
         mHourlyEntries = new ArrayList<>();
@@ -177,6 +179,8 @@ public class MainActivity extends AppCompatActivity {
         loadBackground();
 
         mToday = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
+        mRightNow = Calendar.getInstance();
+
         mHourlyEntries.clear();
         mWeeklyEntries.clear();
         attachStepCountListener();
@@ -270,22 +274,27 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String previousChildName) {
                 int currentHour = mRightNow.get(Calendar.HOUR_OF_DAY);
-                int currentHourSteps = dataSnapshot.getValue(Integer.class) == null ? 0 : dataSnapshot.getValue(Integer.class);
+                int hourSteps = dataSnapshot.getValue(Integer.class) == null ? 0 : dataSnapshot.getValue(Integer.class);
+                String hourKey = dataSnapshot.getKey();
 
-                mHourlyEntries.add(new BarEntry(mHourlyEntries.size(), currentHourSteps));
-
-                if (previousChildName == null) {
+                if (mHourlyEntries.get(0).getY() == -1) {
                     mHourlyEntries.remove(0);
                 }
 
-                if (currentHourSteps > mHourlyChart.getAxisLeft().getAxisMaximum()) {
-                    mHourlyChart.getAxisLeft().setAxisMaximum(currentHourSteps + 100);
+                mHourlyEntries.add(new BarEntry(Integer.parseInt(hourKey), hourSteps));
+
+                SharedPreferences.Editor editor = mSharedPref.edit();
+                String prefHourKey = "hour_" + hourKey;
+                editor.putInt(prefHourKey, hourSteps);
+                editor.commit();
+
+                if (hourSteps > mHourlyChart.getAxisLeft().getAxisMaximum()) {
+                    mHourlyChart.getAxisLeft().setAxisMaximum(hourSteps + 100);
                 }
 
                 mHourlyChart.notifyDataSetChanged();
                 mHourlyChart.invalidate();
                 mHourlyChart.highlightValue(currentHour, 0);
-
                 mHourlyChart.animateY(3000);
             }
 
@@ -313,7 +322,7 @@ public class MainActivity extends AppCompatActivity {
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String previousChildName) {
                 int currentDaySteps = dataSnapshot.getValue(Integer.class) == null ? 0 : dataSnapshot.getValue(Integer.class);
 
-                if (mWeeklyEntries.size() == 1 && mWeeklyEntries.get(0).getY() == -1) {
+                if (mWeeklyEntries.get(0).getY() == -1) {
                     mWeeklyEntries.remove(0);
                 }
 
@@ -330,7 +339,6 @@ public class MainActivity extends AppCompatActivity {
                 mWeeklyChart.notifyDataSetChanged();
                 mWeeklyChart.invalidate();
                 mWeeklyChart.highlightValue(mWeeklyEntries.size() - 1, 0);
-
                 mWeeklyChart.animateY(3000);
             }
 
@@ -440,7 +448,7 @@ public class MainActivity extends AppCompatActivity {
         YAxis yAxis = mWeeklyChart.getAxisLeft();
         yAxis.setEnabled(true);
         yAxis.setAxisMinimum(0f);
-        yAxis.setAxisMaximum(1000f);
+        yAxis.setAxisMaximum(mStepGoal + 1000f);
         yAxis.setDrawAxisLine(false);
         yAxis.setDrawGridLines(false);
         yAxis.setDrawLabels(false);
