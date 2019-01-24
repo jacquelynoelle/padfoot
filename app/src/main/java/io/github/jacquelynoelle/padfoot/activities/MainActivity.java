@@ -29,6 +29,7 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.StackedValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -49,6 +50,7 @@ import java.util.HashMap;
 
 import io.github.jacquelynoelle.padfoot.DailyStepReset;
 import io.github.jacquelynoelle.padfoot.R;
+import io.github.jacquelynoelle.padfoot.ValueFormatter;
 import io.github.jacquelynoelle.padfoot.bluetoothle.BLEService;
 
 public class MainActivity extends AppCompatActivity {
@@ -254,6 +256,7 @@ public class MainActivity extends AppCompatActivity {
         mHourlyStepCountListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String previousChildName) {
+                int currentHour = mRightNow.get(Calendar.HOUR_OF_DAY);
                 int currentHourSteps = dataSnapshot.getValue(Integer.class) == null ? 0 : dataSnapshot.getValue(Integer.class);
 
                 mHourlyEntries.add(new BarEntry(mHourlyEntries.size(), currentHourSteps));
@@ -268,6 +271,8 @@ public class MainActivity extends AppCompatActivity {
 
                 mHourlyChart.notifyDataSetChanged();
                 mHourlyChart.invalidate();
+                mHourlyChart.highlightValue(currentHour, 0);
+
                 mHourlyChart.animateY(3000);
             }
 
@@ -311,6 +316,8 @@ public class MainActivity extends AppCompatActivity {
 
                 mWeeklyChart.notifyDataSetChanged();
                 mWeeklyChart.invalidate();
+                mWeeklyChart.highlightValue(mWeeklyEntries.size() - 1, 0);
+
                 mWeeklyChart.animateY(3000);
             }
 
@@ -365,10 +372,10 @@ public class MainActivity extends AppCompatActivity {
         xAxis.setAxisMinimum(-0.5f);
         xAxis.setAxisMaximum(24.5f);
 
-        mHourlyChart.getAxisLeft().setEnabled(true);
+        mHourlyChart.getAxisLeft().setEnabled(false);
         mHourlyChart.getAxisRight().setEnabled(false);
         mHourlyChart.getAxisLeft().setAxisMinimum(0f);
-        mHourlyChart.getAxisLeft().setAxisMaximum(1000f);
+        mHourlyChart.getAxisLeft().setAxisMaximum(500f);
 
         mHourlyChart.getLegend().setEnabled(false);   // Hide the legend
 
@@ -376,7 +383,10 @@ public class MainActivity extends AppCompatActivity {
 
         BarDataSet barDataSet = new BarDataSet(mHourlyEntries, "Cells");
         barDataSet.setHighlightEnabled(true);
-        barDataSet.setDrawValues(false);
+        barDataSet.setValueFormatter(new ValueFormatter());
+        barDataSet.setDrawValues(true);
+        barDataSet.setValueTextSize(6);
+        barDataSet.setValueTextColor(ContextCompat.getColor(this, R.color.colorLightGrey));
         barDataSet.setHighLightColor(ContextCompat.getColor(this, R.color.colorPrimaryLight));
         barDataSet.setHighLightAlpha(255);
 
@@ -412,10 +422,10 @@ public class MainActivity extends AppCompatActivity {
         xAxis.setAxisMinimum(-0.5f);
         xAxis.setAxisMaximum(6.5f);
 
-        mWeeklyChart.getAxisLeft().setEnabled(true);
+        mWeeklyChart.getAxisLeft().setEnabled(false);
         mWeeklyChart.getAxisRight().setEnabled(false);
         mWeeklyChart.getAxisLeft().setAxisMinimum(0f);
-        mHourlyChart.getAxisLeft().setAxisMaximum(1000f);
+        mWeeklyChart.getAxisLeft().setAxisMaximum(1000f);
 
         mWeeklyChart.getLegend().setEnabled(false);   // Hide the legend
 
@@ -423,7 +433,10 @@ public class MainActivity extends AppCompatActivity {
 
         BarDataSet barDataSet = new BarDataSet(mWeeklyEntries, "Cells");
         barDataSet.setHighlightEnabled(true);
-        barDataSet.setDrawValues(false);
+        barDataSet.setValueFormatter(new ValueFormatter());
+        barDataSet.setDrawValues(true);
+        barDataSet.setValueTextSize(8);
+        barDataSet.setValueTextColor(ContextCompat.getColor(this, R.color.colorLightGrey));
         barDataSet.setHighLightColor(ContextCompat.getColor(this, R.color.colorPrimaryLight));
         barDataSet.setHighLightAlpha(255);
 
