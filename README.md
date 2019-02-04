@@ -3,7 +3,7 @@ Padfoot is a activity tracking application for four-legged friends, developed fo
 
 You can find a copy of my presentation, including a demo, [here](https://docs.google.com/presentation/d/194CYs_QVgdxTuEOwFOGOsLW1hw3vMLnqcob7OLrou4g/edit?usp=sharing).  
 
-This repository contains the source code for the Padfoot Android application, which can be run and installed through Android Studio. Its sister repository contains the code and instructions for building the accompanying pedometer.
+This repository contains the source code for the Padfoot Android application, which can be run and installed through Android Studio. Its [sister repository](https://github.com/jacquelynoelle/padfoot_tracker) contains the code and instructions for building the accompanying pedometer.
 
 ## Running Padfoot
 Please note that you will not be able to observe Padfoot's step counting features without the physical pedometer. 
